@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="尹祺翔">
+
+
+
+
+
+<title>图像复原中的应用--Uformer | yqxBlog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+            <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.2">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">BUPTyqx&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">BUPTyqx&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">图像复原中的应用--Uformer</h1>
+            
+                <div class="post-meta">
+                    
+                        🦹‍♀️作者: <a itemprop="author" rel="author" href="/">尹祺翔</a><br>
+                    
+
+                    
+                        <span class="post-time">
+                        ⏲️时间: <a href="#">July 2, 2022&nbsp;&nbsp;17:31:20</a><br>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                            📒目录:
+                            
+                                <a href="/categories/Transformer%E6%A8%A1%E5%9E%8B/">Transformer模型</a><br>
+                            
+                        </span>
+                    
+                    
+                    
+                        <span class="post-count">
+                            📑字数:
+                        <a href="">1,986</a><br>  
+                        </span>
+                    
+                    
+                        <span class="post-count">
+                    ⏰预计阅读时间:
+                        <a href="">8min</a>  
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="Uformer"><a href="#Uformer" class="headerlink" title="Uformer"></a>Uformer</h1><h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>Uformer有两个核心结构：</p>
+<ul>
+<li>局部增强窗transformer结构，采用了基于窗的自注意力机制来降低算力要求，并在前馈网络中采用深度卷积捕获更多局部上下文信息；</li>
+<li>采用三种skip connection结构将编码器中的信息传递到解码器。实验部分在去噪、去雨、去模糊、去摩尔纹等图像恢复任务上进行了测试。</li>
+</ul>
+<h2 id="1-模型结构"><a href="#1-模型结构" class="headerlink" title="1.模型结构"></a>1.模型结构</h2><p>Uformer 是 2 个针对图像复原任务 (Image Restoration) 的 Transformer 模型，它的特点是：</p>
+<ul>
+<li>长得很像 U-Net (医学图像分割的经典模型)，有Encoder，有Decoder，且 Encoder 和 Decoder 之间还有 Skip-Connections。</li>
+<li>在 Transformer 的Block中融合了卷积。</li>
+</ul>
+<p>下图是论文种Uformer的架构示意，但是该图不是很直观。</p>
+<p><img src="/2022/07/02/Transformer-Uformer%E6%A8%A1%E5%9E%8B/image-20220227170220193.png" alt="image-20220227170220193"></p>
+<p>在官方的代码中，提供了更加具体的模型结构示意。作者已经把张量的维度标注在了图里面。</p>
+<ul>
+<li>整体类似U-Net</li>
+<li>有Encoder，有Decoder</li>
+<li>Encoder 和 Decoder 之间还有 Skip-Connections连接。</li>
+</ul>
+<p><img src="/2022/07/02/Transformer-Uformer%E6%A8%A1%E5%9E%8B/nn.png" alt="nn"></p>
+<p><strong>1）卷积提取特征(Input Projection)</strong></p>
+<p>第一层卷积层进行底层特征提取，输入一个Degraded Image$\mathbf{I} \in \mathbb{R}^{3 \times H \times W}$，Uformer首先通过$3\times 3$卷积和 <strong>LeakyReLU激活函数</strong>来提取底层特征，得到$\mathbf{X}_{0} \in \mathbb{R}^{C \times H \times W}$。</p>
+<p><strong>2) Encoder：</strong></p>
+<ul>
+<li>接着$\mathbf{X}_{0} \in \mathbb{R}^{C \times H \times W}$进入U形结构的Encoder部分，一共是$K$个阶段，每个阶段由<strong>2个 LeWin Transformer Block </strong>和 <strong>1个下采样 Down-sampling 层</strong>组成。<ul>
+<li>LeWin Transformer Block：首先把张量 reshape成1D的序列特征$\mathbf{X}^{‘} \in \mathbb{R}^{ HW \times C}$，它可以借助 Self-attention 机制的建模长序列信息的能力并通过 non-overlapping windows的办法节约计算量。</li>
+<li>下采样 Down-sampling 层：首先把张量 reshape成2D的空间特征，再通过一个$k=4,s=2$（步长为2的$4\times 4$）的卷积操作进行下采样，并将通道数加倍。经过这2步以后，第1个stage输出的张量维度是$2C\times \frac{H}{2}\times \frac{W}{2}$，第$l$个stage输出的张量维度是$2^lC\times \frac{H}{2^l}\times\frac{W}{2^l}$。</li>
+</ul>
+</li>
+</ul>
+<p><strong>3) Bottleneck Stage：</strong></p>
+<ul>
+<li>Bottleneck Stage，本质上是通过2个LeWin Transformer Block。</li>
+<li>编码器的最后一层堆叠多个LeWin transformer块，这些LeWin transformer块可以捕获到长程信息，如果特征图大小和卷积核尺寸相同相当于是全局信息。</li>
+</ul>
+<p><strong>4) Decoder：</strong></p>
+<p>Decoder 用于特征的重建，一共是$K$个阶段，每个阶段由 1个上采样 Up-sampling 层 2个 LeWin Transformer Block 组成。</p>
+<ul>
+<li>首先，上采样层也是先把张量 reshape成2D的空间特征，再通过$k=2,s=2$（步长为2，尺寸为$2\times 2$）的 <strong>Transposed Convolution</strong>（转置卷积） 执行，上采样层处理后分辨率变为4倍，通道数减半。</li>
+<li>其次，这个上采样后的特征和来自Skip-Connection的 Encoder的特征一起输入 LeWin Transformer Block，通过它来恢复丢失的数据。 $K$个阶段完成以后，通过一个3×3卷积得到Residual Image$\mathbf{R} \in \mathbb{R}^{3 \times H \times W}$。</li>
+</ul>
+<p>实验中设置$K=4$，即Encoder和 Decoder都是4个阶段，所以skip-connection有3个，损失函数是Charbonnier loss：</p>
+<script type="math/tex; mode=display">
+\ell\left(\mathbf{I}^{\prime}, \hat{\mathbf{I}}\right)=\sqrt{\left\|\mathbf{I}^{\prime}-\hat{\mathbf{I}}\right\|^{2}+\epsilon^{2}}</script><p>其中，$\hat{\mathbf{I}}$是真实值，$\epsilon=10^{-3}$是微小值。</p>
+<p>概括起来，Uformer主要有以下三个部分结构上的两点。</p>
+<ul>
+<li><strong>W-MSA:</strong>Window-based Multi-head Self-Attention </li>
+<li><strong>LeFF:</strong>Locally-enhanced Feed-Forward Network</li>
+<li><strong>Skip-Connection:</strong>(a) Concat-Skip,(b) Cross-Skip, and (c) ConcatCross-Skip.</li>
+</ul>
+<p><img src="/2022/07/02/Transformer-Uformer%E6%A8%A1%E5%9E%8B/skip.png" alt="skip"></p>
+<h2 id="2-LeWin-Transformer-Block"><a href="#2-LeWin-Transformer-Block" class="headerlink" title="2.LeWin Transformer Block"></a>2.LeWin Transformer Block</h2><p>两个重要的结论：</p>
+<ul>
+<li><strong>计算全部 tokens 之间的 attention 是不合适的。</strong>对于 Image Restoration 的任务一般都是高分辨率的图片，比如1048×1048的图片，此时得到的patches数量会很多，如果还计算全部 tokens 之间的attention的话，计算量开销会变得很大（$O((\text{token})^2)$），显然不合适。</li>
+<li><strong>每个 patch 的 local 的上下文信息很重要。</strong>对于 Image Restoration 的任务local的上下文信息很重要。一个 degraded pixel 的邻近 pixel 可以帮助这个 pixel 完成重建。</li>
+</ul>
+<p>所以，提出了locally-enhanced window (LeWin) Transformer block：</p>
+<ul>
+<li>W-MSA：non-overlapping Window-based Multi-head Self-Attention ，窗之间不重叠；</li>
+<li>LeFF：也就是Locally-enhanced Feed-Forward Network (LeFF) 。</li>
+</ul>
+<p>因此一个LeWin transformer块的计算如下：</p>
+<script type="math/tex; mode=display">
+\begin{array}{l}
+\mathbf{X}_{l}^{\prime}=\mathrm{W}-\mathrm{MSA}\left(\mathrm{LN}\left(\mathbf{X}_{l-1}\right)\right)+\mathbf{X}_{l-1} \\
+\mathbf{X}_{l}=\operatorname{LeFF}\left(\mathrm{LN}\left(\mathbf{X}_{l}^{\prime}\right)\right)+\mathbf{X}_{l}^{\prime}
+\end{array}</script><h3 id="2-1-W-MSA"><a href="#2-1-W-MSA" class="headerlink" title="2.1 W-MSA"></a>2.1 W-MSA</h3><p>这个模块是LeWin Transformer Block 的第1步。具体而言，它不使用全部的 tokens 来做 Self-attention，而是在不重叠的局部窗口 (non-overlapping local windows) 里面去做attention，以减少计算量。</p>
+<p><img src="/2022/07/02/Transformer-Uformer%E6%A8%A1%E5%9E%8B/image-20220227172959071.png" alt="image-20220227172959071"></p>
+<p>输入2D的特征图$\mathbf{X}_{0} \in \mathbb{R}^{C \times H \times W}$，宽为$H$高为$W$</p>
+<ul>
+<li>把这个特征图分成大小为$M\times M$的相互不重叠的 windows（如上图我们有16个 windows）</li>
+<li>将每个窗的图像拉伸为一维，把每个 windows 的张量展平后得到的维度都是$\mathbf{X}^{i} \in \mathbb{R}^{M^2\times C}$。</li>
+<li>对每个 window 执行 Self-attention。假设 head 的数量是$k$ ，每个 head 的维度是$d_k=C/k$。则计算某个 window 中的第$k$个 self-attention 操作可以写为：</li>
+</ul>
+<script type="math/tex; mode=display">
+\begin{array}{l}
+\mathbf{X}=\left\{\mathbf{X}^{1}, \mathbf{X}^{2}, \ldots, \mathbf{X}^{N}\right\}, \quad N=H W / M^{2}, \\
+\mathbf{Y}_{k}^{i}=\operatorname{Attention}\left(\mathbf{X}^{i} \mathbf{W}_{k}^{Q}, \mathbf{X}^{i} \mathbf{W}_{k}^{K}, \mathbf{X}^{i} \mathbf{W}_{k}^{V}\right), i=1, \ldots, N, \\
+\hat{\mathbf{X}}_{k}=\left\{\mathbf{Y}_{k}^{1}, \mathbf{Y}_{k}^{2}, \ldots, \mathbf{Y}_{k}^{M}\right\},
+\end{array}</script><blockquote>
+<ul>
+<li>$\mathbf{X}^i$代表第$i$个window，$\mathbf{Y}_k^i$代表第$i$个window的第$k$个head的结果，$\hat{\mathbf{X}}_{k}$代表第$k$个head的所有windows综合起来的结果。</li>
+<li>$\mathbf{W}_{k}^Q,\mathbf{W}_{k}^K,\mathbf{W}_{k}^V\in \mathbb{R}^{C \times d_k}$分别表示第$k$个head的queries，keys，values的映射矩阵。</li>
+</ul>
+</blockquote>
+<p>在attention module里面仍然采用的是相对位置编码 (relative position encoding)，所以attention的表达式为：</p>
+<script type="math/tex; mode=display">
+\text { Attention }(\mathbf{Q}, \mathbf{K}, \mathbf{V})=\operatorname{SoftMax}\left(\frac{\mathbf{Q K}^{T}}{\sqrt{d_{k}}}+\mathbf{B}\right) \mathbf{V}</script><p>式子中，$\mathbf{B}$是相对位置编码，其值来自于可学习的$\hat{\mathbf{B}} \in \mathbb{R}^{(2 M-1) \times(2 M-1)}$矩阵。在输入特征图为$\mathbf{X} \in \mathbb{R}^{C \times H \times W}$，如果使用全局的self-attention，则序列长度为$N=HW$，计算量为$O(H^2W^2C)$，如果使用全局W-MSA，有$\frac{H}{M}\frac{W}{M}$个windows，每个windows的计算量为$M^4C$，所以此时的计算量为$O(M^2HWC)$。同时因为用了层级结构，低分辨率上的自注意力机制就可以获得很大的感受野，足以学习长程信息。</p>
+<h3 id="2-2-Leff"><a href="#2-2-Leff" class="headerlink" title="2.2 Leff"></a>2.2 Leff</h3><ul>
+<li>首先特征通过一个 FC 层来增大特征的维度 (feature dimension)，再把序列化的1D特征 reshape 成 2D的特征，并通过 3×3 的 Depth-wise Convolution来建模 local 的信息。</li>
+<li>再把2D的特征 reshape 成序列化的1D特征，并通过一个 FC 层来减少特征的维度到原来的值，每一个 FC 层或 Depth-wise 卷积层后使用 GeLU 激活函数。</li>
+</ul>
+<p><img src="/2022/07/02/Transformer-Uformer%E6%A8%A1%E5%9E%8B/image-20220227223658236.png" alt="image-20220227223658236"></p>
+<h2 id="3-Skip-Connection"><a href="#3-Skip-Connection" class="headerlink" title="3.Skip-Connection"></a>3.Skip-Connection</h2><p>为了研究如何把 Encoder 里面的 low-level 的特征更好地传递给 Decoder，作者探索了3种Skip-Connection的方式。</p>
+<p>首先 Decoder 中的每个 LeWin Transformer Block 要综合2方面的信息，其一是来自 Encoder的输出$E_l\in 2^{l-1}C\times \frac{H}{2^{l-1}}\times \frac{W}{2^{l-1}}$，其二是来自Decoder的输出$D_{l-1}\in 2^{l-1}C\times \frac{H}{2^{l-1}}\times \frac{W}{2^{l-1}}$</p>
+<ul>
+<li>Concatenation-based Skip-connection (<strong>Concat-Skip</strong>)：直接把二者在 channel 这个维度给 concatenate 在一起，得到的张量维度是$2^{l}C\times \frac{H}{2^{l-1}}\times \frac{W}{2^{l-1}}$，把它输入给 W-MSA 模块。</li>
+<li>Cross-attention as Skip-connection (<strong>Cross-Skip</strong>)：给Decoder阶段的每个 LeWin Transformer block 里面加一个额外的attention module，这个 attention module 的 query 是第1个W-MAS的输出，key 和 value 都是$E_l$</li>
+<li>Concatenation-based Cross-attention as Skip-connection (<strong>Concat Cross-Skip</strong>)：把二者在 channel 这个维度给 concatenate 在一起，且W-MSA 的query 是$D_{l-1}$，key 和 value 都是 concat 后的结果。</li>
+</ul>
+<p><img src="/2022/07/02/Transformer-Uformer%E6%A8%A1%E5%9E%8B/image-20220227223956151.png" alt="image-20220227223956151"></p>
+<h2 id="4-实验"><a href="#4-实验" class="headerlink" title="4.实验"></a>4.实验</h2><h3 id="4-1实验设置"><a href="#4-1实验设置" class="headerlink" title="4.1实验设置"></a>4.1实验设置</h3><ul>
+<li>优化器：AdamW</li>
+<li>momentum：0.9,0。999</li>
+<li>weight decay：0.02</li>
+<li>数据增强：horizontal flipping，旋转90°，180°，270°。</li>
+<li>学习率变化策略：cosine decay strategy</li>
+<li>初始学习率：2e-4，变化到1e-6。</li>
+<li>window size：8×8，则一个 window 是8×8的，一个wendow的序列长度是64。</li>
+<li>Evaluation metrics：PSNR 和 SSIM。</li>
+</ul>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">🏷️计算机视觉</a>
+                    
+                        <a href="/tags/%E7%BC%96%E7%A8%8B/">🏷️编程</a>
+                    
+                        <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">🏷️深度学习</a>
+                    
+                        <a href="/tags/Transformer/">🏷️Transformer</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2022/07/02/%E6%8E%A2%E7%B4%A2%E5%A4%9A%E7%A7%8D%E5%A4%A9%E7%BA%BF%E7%9A%84%E8%BF%9C%E7%A8%8BWiFi%E4%BC%A0%E6%84%9F/">论文笔记--探索多种天线的远程WiFi传感</a>
+            
+            
+            <a class="next" rel="next" href="/2022/07/02/VGG%E7%AC%94%E8%AE%B0/">VGG模型笔记</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 尹祺翔 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

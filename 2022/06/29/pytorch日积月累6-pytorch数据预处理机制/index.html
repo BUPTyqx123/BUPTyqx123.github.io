@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="尹祺翔">
+
+
+
+
+
+<title>pytorch日积月累-pytorch数据预处理机制 | yqxBlog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+            <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.2">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">BUPTyqx&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">BUPTyqx&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">pytorch日积月累-pytorch数据预处理机制</h1>
+            
+                <div class="post-meta">
+                    
+                        🦹‍♀️作者: <a itemprop="author" rel="author" href="/">尹祺翔</a><br>
+                    
+
+                    
+                        <span class="post-time">
+                        ⏲️时间: <a href="#">June 29, 2022&nbsp;&nbsp;15:13:08</a><br>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                            📒目录:
+                            
+                                <a href="/categories/pytorch%E6%97%A5%E7%A7%AF%E6%9C%88%E7%B4%AF/">pytorch日积月累</a><br>
+                            
+                        </span>
+                    
+                    
+                    
+                        <span class="post-count">
+                            📑字数:
+                        <a href="">2,532</a><br>  
+                        </span>
+                    
+                    
+                        <span class="post-count">
+                    ⏰预计阅读时间:
+                        <a href="">12min</a>  
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="pytorch日积月累6-pytorch数据预处理机制"><a href="#pytorch日积月累6-pytorch数据预处理机制" class="headerlink" title="pytorch日积月累6-pytorch数据预处理机制"></a>pytorch日积月累6-pytorch数据预处理机制</h1><h3 id="1-1概述"><a href="#1-1概述" class="headerlink" title="1.1概述"></a>1.1概述</h3><ul>
+<li><code>torchvision.transforms</code> : 常用的图像预处理方法</li>
+<li><code>torchvision.datasets</code> : 常用数据集的dataset实现，MNIST，CIFAR-10，ImageNet等</li>
+<li><code>torchvision.model</code> : 常用的模型预训练，AlexNet，VGG， ResNet，GoogLeNet等</li>
+</ul>
+<p><code>torchvision.transforms</code> : 常用的图像预处理方法：数据中心化，数据标准化，缩放，裁剪，旋转，翻转，填充，噪声添加，灰度变换，线性变换，仿射变换，亮度、饱和度及对比度变换。</p>
+<p>示例：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">train_transform = transforms.Compose([</span><br><span class="line">    transforms.Resize((<span class="number">32</span>, <span class="number">32</span>)),              <span class="comment">#图像大小变化</span></span><br><span class="line">    transforms.RandomCrop(<span class="number">32</span>, padding=<span class="number">4</span>),     <span class="comment">#随机裁剪</span></span><br><span class="line">    transforms.ToTensor(),                    <span class="comment">#图片转化为张量</span></span><br><span class="line">    transforms.Normalize(norm_mean, norm_std),<span class="comment">#图像归一化</span></span><br><span class="line">])</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/06/29/pytorch%E6%97%A5%E7%A7%AF%E6%9C%88%E7%B4%AF6-pytorch%E6%95%B0%E6%8D%AE%E9%A2%84%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6/image-20200820223032848.png" alt="image-20200820223032848"></p>
+<ul>
+<li><code>transforms.Normalize</code></li>
+<li>功能：逐channel的对图像进行标准化<code>output = (input - mean) / std</code></li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">transforms.Normalize(mean,          <span class="comment">#各通道的均值</span></span><br><span class="line">                     std,           <span class="comment">#各通道的标准差</span></span><br><span class="line">                     inplace=<span class="literal">False</span>) <span class="comment">#是否原地操作</span></span><br></pre></td></tr></tbody></table></figure>
+<p><strong>数据增强</strong></p>
+<p>数据增强又称为数据增广，数据扩增，它是对训练集进行变换，使训练集更丰富，从而让模型更具泛化能力。</p>
+<p><img src="/2022/06/29/pytorch%E6%97%A5%E7%A7%AF%E6%9C%88%E7%B4%AF6-pytorch%E6%95%B0%E6%8D%AE%E9%A2%84%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6/image-20200820223726630.png" alt="image-20200820223726630" style="zoom:80%;"></p>
+<h3 id="1-2剪裁"><a href="#1-2剪裁" class="headerlink" title="1.2剪裁"></a>1.2剪裁</h3><p>1.<code>transforms.CenterCrop</code></p>
+<ul>
+<li>功能：从图像中心裁剪图片</li>
+<li><code>size</code>：所需裁剪图片尺寸</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">train_transform = transforms.Compose([</span><br><span class="line">    transforms.Resize((<span class="number">224</span>, <span class="number">224</span>)),</span><br><span class="line">    <span class="comment"># CenterCrop</span></span><br><span class="line">    transforms.CenterCrop(<span class="number">200</span>)</span><br><span class="line">    <span class="comment">#如果超出了范围自动补充黑色区域    </span></span><br><span class="line">])</span><br></pre></td></tr></tbody></table></figure>
+<p>2.<code>transforms.RandomCrop</code></p>
+<p>功能：从图片中随机裁剪出尺寸为size的图片</p>
+<ul>
+<li><code>padding_mode</code>：填充模式，有4种模式<ul>
+<li><code>constant</code>：像素值由fill设定</li>
+<li><code>edge</code>：像素值由图像边缘像素决定</li>
+<li><code>reflect</code>：镜像填充，最后一个像素不镜像，eg：[1,2,3,4] → [3,2,1,2,3,4,3,2]</li>
+<li><code>symmetric</code>：镜像填充，最后一个像素镜像，eg：[1,2,3,4] → [2,1,1,2,3,4,4,3]</li>
+</ul>
+</li>
+<li><p><code>padding</code>：设置填充大小</p>
+<ul>
+<li>当为a时，上下左右均填充a个像素</li>
+<li>当为(a,b)时，上下填充b个像素，左右填充a个像素</li>
+<li>当为(a,b,c,d)时，左上右下填充abcd</li>
+</ul>
+</li>
+<li><p><code>fill</code>：constant时，设置填充的像素值,可以设置其他的RGB值</p>
+</li>
+<li><code>pad_if_needed</code>：若图像小于设定size，则填充</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">transforms.RandomCrop(size,<span class="comment">#所需裁剪图片尺寸 </span></span><br><span class="line">                      padding=<span class="literal">None</span>, <span class="comment">#设置填充大小</span></span><br><span class="line">                      pad_if_needed=<span class="literal">False</span>, </span><br><span class="line">                      fill=<span class="number">0</span>, </span><br><span class="line">                      padding_mode=<span class="string">'constant'</span>)</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">train_transform = transforms.Compose([</span><br><span class="line">    transforms.Resize((<span class="number">224</span>, <span class="number">224</span>)),</span><br><span class="line">    <span class="comment"># 2 RandomCrop</span></span><br><span class="line">    transforms.RandomCrop(<span class="number">224</span>, padding=<span class="number">16</span>),</span><br><span class="line">    transforms.RandomCrop(<span class="number">224</span>, padding=(<span class="number">16</span>, <span class="number">64</span>)),</span><br><span class="line">    transforms.RandomCrop(<span class="number">224</span>, padding=<span class="number">16</span>, fill=(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>)),</span><br><span class="line">    transforms.RandomCrop(<span class="number">512</span>, pad_if_needed=<span class="literal">True</span>),<span class="comment"># pad_if_needed=True</span></span><br><span class="line">    transforms.RandomCrop(<span class="number">224</span>, padding=<span class="number">64</span>, padding_mode=<span class="string">'edge'</span>),</span><br><span class="line">    transforms.RandomCrop(<span class="number">224</span>, padding=<span class="number">64</span>, padding_mode=<span class="string">'reflect'</span>),</span><br><span class="line">    transforms.RandomCrop(<span class="number">1024</span>, padding=<span class="number">1024</span>, padding_mode=<span class="string">'symmetric'</span>)</span><br><span class="line">])</span><br></pre></td></tr></tbody></table></figure>
+<ol>
+<li><code>transforms.RandomResizedCrop()</code></li>
+</ol>
+<p>功能：随机大小，长宽比裁剪图片：</p>
+<ul>
+<li><code>size</code>：所需裁剪图片尺寸</li>
+<li><code>scale</code>：随机裁剪面积比例, 默认(0.08, 1)</li>
+<li><code>ratio</code>：随机长宽比，默认(3/4, 4/3)</li>
+<li><code>interpolation</code>：插值方法<ul>
+<li><code>PIL.Image.NEAREST</code></li>
+<li><code>PIL.Image.BILINEAR</code></li>
+<li><code>PIL.Image.BICUBIC</code></li>
+</ul>
+</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">RandomResizedCrop(size, </span><br><span class="line">                  scale=(<span class="number">0.08</span>, <span class="number">1.0</span>),</span><br><span class="line">                  ratio=(<span class="number">3</span>/<span class="number">4</span>, <span class="number">4</span>/<span class="number">3</span>), </span><br><span class="line">                 interpolation)</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">train_transform = transforms.Compose([</span><br><span class="line">    transforms.Resize((<span class="number">224</span>, <span class="number">224</span>)),</span><br><span class="line">    transforms.RandomResizedCrop(size=<span class="number">224</span>, scale=(<span class="number">0.5</span>, <span class="number">0.5</span>))</span><br><span class="line">])</span><br></pre></td></tr></tbody></table></figure>
+<p>4.<code>transforms.FiveCrop</code></p>
+<ul>
+<li>功能：在图像的上下左右以及中心裁剪出尺寸为size的5张图片</li>
+<li><code>TenCrop</code>对这5张图片进行水平或者垂直镜像获得10张图片<ul>
+<li><code>size</code>：所需裁剪图片尺寸</li>
+<li><code>vertical_flip</code>：是否垂直翻转</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">transforms.FiveCrop(size)</span><br><span class="line">transforms.TenCrop(size, vertical_flip=<span class="literal">False</span>)</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">train_transform = transforms.Compose([</span><br><span class="line">    transforms.Resize((<span class="number">224</span>, <span class="number">224</span>)),</span><br><span class="line">    transforms.FiveCrop(<span class="number">112</span>),</span><br><span class="line">    transforms.Lambda(<span class="keyword">lambda</span> crops: torch.stack([(transforms.ToTensor()(crop)) <span class="keyword">for</span> crop <span class="keyword">in</span> crops]))</span><br><span class="line">    transforms.TenCrop(<span class="number">112</span>, vertical_flip=<span class="literal">False</span>),</span><br><span class="line">    transforms.Lambda(<span class="keyword">lambda</span> crops: torch.stack([(transforms.ToTensor()(crop)) <span class="keyword">for</span> crop <span class="keyword">in</span> crops])),</span><br><span class="line">])</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="1-3翻转"><a href="#1-3翻转" class="headerlink" title="1.3翻转"></a>1.3翻转</h3><p>1.<code>RandomHorizontalFlip</code>和<code>RandomVerticalFlip</code></p>
+<ul>
+<li>功能：依概率水平（左右）或垂直（上下）翻转图片<ul>
+<li>p：翻转概率</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">RandomHorizontalFlip(p=<span class="number">0.5</span>)</span><br><span class="line">RandomVerticalFlip(p=<span class="number">0.5</span>)</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">train_transform = transforms.Compose([</span><br><span class="line">    transforms.Resize((<span class="number">224</span>, <span class="number">224</span>)),</span><br><span class="line">    <span class="comment"># 1 Horizontal Flip</span></span><br><span class="line">    transforms.RandomHorizontalFlip(p=<span class="number">1</span>),</span><br><span class="line">    <span class="comment"># 2 Vertical Flip</span></span><br><span class="line">    transforms.RandomVerticalFlip(p=<span class="number">0.5</span>),</span><br><span class="line">])</span><br></pre></td></tr></tbody></table></figure>
+<p>2.<code>RandomRotation</code> </p>
+<ul>
+<li>功能：随机旋转图片</li>
+<li><code>degrees</code>：旋转角度<ul>
+<li>当为a时，在（-a，a）之间选择旋转角度</li>
+<li>当为(a, b)时，在(a, b)之间选择旋转角度</li>
+</ul>
+</li>
+<li><code>resample</code>：重采样方法</li>
+<li><code>expand</code>：是否扩大图片</li>
+<li><code>center</code>：默认为中心旋转，也可以设置左上角旋转</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">RandomRotation(degrees, </span><br><span class="line">               resample=<span class="literal">False</span>, </span><br><span class="line">               expand=<span class="literal">False</span>, </span><br><span class="line">               center=<span class="literal">None</span>)</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">train_transform = transforms.Compose([</span><br><span class="line">     transforms.Resize((<span class="number">224</span>, <span class="number">224</span>)),</span><br><span class="line">     transforms.RandomRotation(<span class="number">90</span>),</span><br><span class="line">     transforms.RandomRotation((<span class="number">90</span>), expand=<span class="literal">True</span>),</span><br><span class="line">     transforms.RandomRotation(<span class="number">30</span>, center=(<span class="number">0</span>, <span class="number">0</span>)),</span><br><span class="line">     transforms.RandomRotation(<span class="number">30</span>, center=(<span class="number">0</span>, <span class="number">0</span>), expand=<span class="literal">True</span>),   </span><br><span class="line">    <span class="comment"># expand only for center rotation</span></span><br><span class="line">])</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="1-4图像变换"><a href="#1-4图像变换" class="headerlink" title="1.4图像变换"></a>1.4图像变换</h3><p>1.<code>transforms.Pad()</code></p>
+<p>功能：对图片边缘进行填充</p>
+<ul>
+<li><p><code>padding</code>：设置填充大小</p>
+<ul>
+<li>当为a时，上下左右均填充a个像素</li>
+<li>当为(a, b)时，上下填充b个像素，左右填充a个像素</li>
+<li>当为(a, b, c, d)时，左，上，右，下分别填充a, b, c, d</li>
+</ul>
+</li>
+<li><p><code>padding_mode</code>：填充模式，有4种模式，constant、edge、reflect和symmetric</p>
+</li>
+<li><code>fill</code>：constant时，设置填充的像素值，(R, G, B) or (Gray)</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">transforms.Pad(padding, </span><br><span class="line">               fill=<span class="number">0</span>, </span><br><span class="line">               padding_mode=<span class="string">'constant'</span>)</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">transforms.Pad(padding=<span class="number">32</span>, fill=(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>), padding_mode=<span class="string">'constant'</span>),</span><br><span class="line">transforms.Pad(padding=(<span class="number">8</span>, <span class="number">64</span>), fill=(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>), padding_mode=<span class="string">'constant'</span>),</span><br><span class="line">transforms.Pad(padding=(<span class="number">8</span>, <span class="number">16</span>, <span class="number">32</span>, <span class="number">64</span>), fill=(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>), padding_mode=<span class="string">'constant'</span>),</span><br><span class="line">transforms.Pad(padding=(<span class="number">8</span>, <span class="number">16</span>, <span class="number">32</span>, <span class="number">64</span>), fill=(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>), padding_mode=<span class="string">'symmetric'</span>)</span><br></pre></td></tr></tbody></table></figure>
+<p>2.<code>transforms.ColorJitter</code></p>
+<p>功能：调整亮度，对比度，饱和度和色相</p>
+<ul>
+<li>功能：调整亮度、对比度、饱和度和色相</li>
+<li><code>hue</code>：色相参数<ul>
+<li>当为a时，从[-a, a]中选择参数，注： 0&lt;= a &lt;= 0.5</li>
+<li>当为(a, b)时，从[a, b]中选择参数，注：-0.5 &lt;= a &lt;= b &lt;= 0.5</li>
+</ul>
+</li>
+<li><code>brightness</code>：亮度调整因子<ul>
+<li>当为a时，从[max(0, 1-a), 1+a]中随机选择</li>
+<li>当为(a, b)时，从[a, b]中随机选择 </li>
+</ul>
+</li>
+<li><code>contrast</code>：对比度参数，同brightness</li>
+<li><code>saturation</code>：饱和度参数，同brightness </li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">transforms.ColorJitter(brightness=<span class="number">0</span>, </span><br><span class="line">                       contrast=<span class="number">0</span>, </span><br><span class="line">                       saturation=<span class="number">0</span>,</span><br><span class="line">                       hue=<span class="number">0</span>)</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">transforms.ColorJitter(brightness=<span class="number">0.5</span>),</span><br><span class="line">transforms.ColorJitter(contrast=<span class="number">0.5</span>),</span><br><span class="line">transforms.ColorJitter(saturation=<span class="number">0.5</span>),</span><br><span class="line">transforms.ColorJitter(hue=<span class="number">0.3</span>),</span><br></pre></td></tr></tbody></table></figure>
+<p>3.<code>Grayscale</code>和<code>RandomGrayscale</code></p>
+<ul>
+<li>功能：依概率将图片转换为灰度图</li>
+<li><code>num_ouput_channels</code>：输出通道数,只能设1或3</li>
+<li><code>p</code>：概率值，图像被转换为灰度图的概率</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">RandomGrayscale(num_output_channels,</span><br><span class="line">                p=<span class="number">0.1</span>)</span><br><span class="line">                Grayscale(num_output_channels)</span><br><span class="line">    </span><br><span class="line">Grayscale(num_output_channels)<span class="comment">#p=1的RandomGrayscale</span></span><br></pre></td></tr></tbody></table></figure>
+<p>4.<code>RandomAffine</code></p>
+<p>功能：对图像进行仿射变换，仿射变换是二维的线性变换，由五种基本原子变换构成，分别是旋转、平移、缩放、错切和翻转。</p>
+<ul>
+<li><code>degrees</code>：旋转角度设置</li>
+<li><code>translate</code>：平移区间设置，如(a, b), a设置宽（width），b设置高(height)<ul>
+<li>图像在宽维度平移的区间为<script type="math/tex">\text{-img_width} \times a < dx < \text{img_width }\times a</script></li>
+</ul>
+</li>
+<li><code>scale</code>：缩放比例（以面积为单位）</li>
+<li><code>fill_color</code>：填充颜色设置</li>
+<li><code>shear</code>：错切角度设置，有水平错切和垂直错切<ul>
+<li>若为<script type="math/tex">a</script>，则仅在x轴错切，错切角度在<script type="math/tex">(-a, a)</script>之间</li>
+<li>若为<script type="math/tex">(a，b)</script>，则a设置x轴角度，b设置y的角度</li>
+<li>若为<script type="math/tex">(a, b, c, d)</script>，则a, b设置x轴角度，c, d设置y轴角度</li>
+</ul>
+</li>
+<li><code>resample</code>：重采样方式，有<code>NEAREST</code>、<code>BILINEAR</code>、<code>BICUBIC</code></li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">RandomAffine(degrees, </span><br><span class="line">             translate=<span class="literal">None</span>, </span><br><span class="line">             scale=<span class="literal">None</span>, </span><br><span class="line">             shear=<span class="literal">None</span>, </span><br><span class="line">             resample=<span class="literal">False</span>, </span><br><span class="line">             fillcolor=<span class="number">0</span>)</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">transforms.RandomAffine(degrees=<span class="number">30</span>),</span><br><span class="line">transforms.RandomAffine(degrees=<span class="number">0</span>, translate=(<span class="number">0.2</span>, <span class="number">0.2</span>), fillcolor=(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>)),</span><br><span class="line">transforms.RandomAffine(degrees=<span class="number">0</span>, scale=(<span class="number">0.7</span>, <span class="number">0.7</span>)),</span><br><span class="line">transforms.RandomAffine(degrees=<span class="number">0</span>, shear=(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">45</span>)),</span><br><span class="line">transforms.RandomAffine(degrees=<span class="number">0</span>, shear=<span class="number">90</span>, fillcolor=(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>)),</span><br></pre></td></tr></tbody></table></figure>
+<p>5.<code>RandomErasing</code></p>
+<p>功能：对图像进行随机遮挡</p>
+<ul>
+<li><code>p</code>：概率值，执行该操作的概率</li>
+<li><code>scale</code>：遮挡区域的面积</li>
+<li><code>ratio</code>：遮挡区域长宽比</li>
+<li><code>value</code>：设置遮挡区域的像素值，(R, G, B) or (Gray)</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">RandomErasing(p=<span class="number">0.5</span>, </span><br><span class="line">              scale=(<span class="number">0.02</span>, <span class="number">0.33</span>), </span><br><span class="line">              ratio=(<span class="number">0.3</span>, <span class="number">3.3</span>), </span><br><span class="line">              value=<span class="number">0</span>, </span><br><span class="line">              inplace=<span class="literal">False</span>)</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#随机遮挡是在张量上操作，而不是PIL文件</span></span><br><span class="line"><span class="comment">#下面的代码中给出的数据是在论文中推荐的数值，可以在不损失图片信息的情况下进行遮挡</span></span><br><span class="line">transforms.ToTensor(),</span><br><span class="line">transforms.RandomErasing(p=<span class="number">1</span>, scale=(<span class="number">0.02</span>, <span class="number">0.33</span>), </span><br><span class="line">                         ratio=(<span class="number">0.3</span>, <span class="number">3.3</span>), value=(<span class="number">254</span>/<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>)),</span><br><span class="line">transforms.RandomErasing(p=<span class="number">1</span>, scale=(<span class="number">0.02</span>, <span class="number">0.33</span>), </span><br><span class="line">                         ratio=(<span class="number">0.3</span>, <span class="number">3.3</span>), value=<span class="string">'1234'</span>),</span><br></pre></td></tr></tbody></table></figure>
+<ol>
+<li><code>transforms.Lambda</code></li>
+</ol>
+<p>功能：用户自定义lambda方法</p>
+<ul>
+<li>lambd：lambda匿名函数</li>
+</ul>
+<p><code>transforms.Lambda(lambd)</code></p>
+<p><code>lambda [arg1 [,arg2, … , argn]] : expression</code></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">transforms.TenCrop(<span class="number">200</span>, vertical_flip=<span class="literal">True</span>),</span><br><span class="line">transforms.Lambda(<span class="keyword">lambda</span> crops: torch.stack([transforms.Totensor()(crop) <span class="keyword">for</span> crop <span class="keyword">in</span> crops])),</span><br><span class="line"><span class="comment">#把输出的十张PIL图片拼接成tensor文件</span></span><br></pre></td></tr></tbody></table></figure>
+<h3 id="1-5transform选择操作"><a href="#1-5transform选择操作" class="headerlink" title="1.5transform选择操作"></a>1.5transform选择操作</h3><ol>
+<li><p><code>transforms.RandomChoice</code></p>
+<p>功能：从一系列transforms方法中随机挑选一个</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">transforms.RandomChoice([transforms1, transforms2, transforms3])</span><br></pre></td></tr></tbody></table></figure>
+</li>
+<li><p><code>transforms.RandomApply</code></p>
+<p>功能：依据概率执行一组transforms操作</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">transforms.RandomApply([transforms1, transforms2, transforms3], p=<span class="number">0.5</span>)</span><br></pre></td></tr></tbody></table></figure>
+</li>
+<li><p><code>transforms.RandomOrder</code></p>
+<p>功能：对一组transforms操作打乱顺序</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">transforms.RandomOrder([transforms1, transforms2, transforms3])</span><br></pre></td></tr></tbody></table></figure>
+</li>
+</ol>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1 RandomChoice</span></span><br><span class="line">transforms.RandomChoice([transforms.RandomVerticalFlip(p=<span class="number">1</span>), </span><br><span class="line">                         transforms.RandomHorizontalFlip(p=<span class="number">1</span>)]),</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#2 RandomApply</span></span><br><span class="line">transforms.RandomApply([</span><br><span class="line">    transforms.RandomAffine(degrees=<span class="number">0</span>, shear=<span class="number">45</span>, fillcolor=(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>)),</span><br><span class="line">    transforms.Grayscale(num_output_channels=<span class="number">3</span>)], </span><br><span class="line">    p=<span class="number">0.5</span>),</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#3.RandomOrder</span></span><br><span class="line">transforms.RandomOrder([transforms.RandomRotation(<span class="number">15</span>),</span><br><span class="line">                            transforms.Pad(padding=<span class="number">32</span>),</span><br><span class="line">                            transforms.RandomAffine(degrees=<span class="number">0</span>, translate=(<span class="number">0.01</span>, <span class="number">0.1</span>), scale=(<span class="number">0.9</span>, <span class="number">1.1</span>))])</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="1-6自定义transforms"><a href="#1-6自定义transforms" class="headerlink" title="1.6自定义transforms"></a>1.6自定义transforms</h3><p>自定义transforms要素： </p>
+<ol>
+<li>仅接收一个参数，返回一个参数</li>
+<li>注意上下游的输出与输入</li>
+</ol>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Compose</span>(<span class="title class_ inherited__">object</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__call__</span>(<span class="params">self, img</span>):</span><br><span class="line">        <span class="keyword">for</span> t <span class="keyword">in</span> self.transforms:</span><br><span class="line">        	img = t(img)</span><br><span class="line">    	<span class="keyword">return</span> img</span><br></pre></td></tr></tbody></table></figure>
+<p>通过类实现多参数输入：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">YourTransforms</span>(<span class="title class_ inherited__">object</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, ...</span>):</span><br><span class="line">		<span class="comment">#.....</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__call__</span>(<span class="params">self, img</span>):</span><br><span class="line">        <span class="comment">#....</span></span><br><span class="line">        <span class="keyword">return</span> img</span><br></pre></td></tr></tbody></table></figure>
+<ul>
+<li>椒盐噪声椒盐噪声又称为脉冲噪声，是一种随机出现的白点或者黑点, <strong>白点称为盐噪声，黑色为椒噪声。</strong></li>
+<li>信噪比（Signal-Noise Rate, SNR）是衡量噪声的比例，图像中为图像像素的占比。</li>
+</ul>
+<p><img src="/2022/06/29/pytorch%E6%97%A5%E7%A7%AF%E6%9C%88%E7%B4%AF6-pytorch%E6%95%B0%E6%8D%AE%E9%A2%84%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6/image-20200820235156068.png" alt="image-20200820235156068"></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">AddPepperNoise</span>(<span class="title class_ inherited__">object</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, snr, p</span>):</span><br><span class="line">        self.snr = snr</span><br><span class="line">        self.p = p</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__call__</span>(<span class="params">self, img</span>):</span><br><span class="line">         <span class="string">'''</span></span><br><span class="line"><span class="string">         添加椒盐噪声具体实现过程</span></span><br><span class="line"><span class="string">         '''</span></span><br><span class="line">         <span class="keyword">return</span> img</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">AddPepperNoise</span>(<span class="title class_ inherited__">object</span>):</span><br><span class="line">    <span class="string">"""增加椒盐噪声</span></span><br><span class="line"><span class="string">    Args:</span></span><br><span class="line"><span class="string">        snr （float）: Signal Noise Rate</span></span><br><span class="line"><span class="string">        p (float): 概率值，依概率执行该操作</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, snr, p=<span class="number">0.9</span></span>):</span><br><span class="line">        <span class="keyword">assert</span> <span class="built_in">isinstance</span>(snr, <span class="built_in">float</span>) <span class="keyword">and</span> (<span class="built_in">isinstance</span>(p, <span class="built_in">float</span>))    </span><br><span class="line">        self.snr = snr</span><br><span class="line">        self.p = p</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__call__</span>(<span class="params">self, img</span>):</span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        Args:img (PIL Image): PIL Image</span></span><br><span class="line"><span class="string">        Returns:PIL Image: PIL image.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">if</span> random.uniform(<span class="number">0</span>, <span class="number">1</span>) &lt; self.p:<span class="comment">#依据概率</span></span><br><span class="line">            img_ = np.array(img).copy()</span><br><span class="line">            h, w, c = img_.shape</span><br><span class="line">            signal_pct = self.snr</span><br><span class="line">            noise_pct = (<span class="number">1</span> - self.snr)</span><br><span class="line">            mask = np.random.choice((<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>), </span><br><span class="line">                                    size=(h, w, <span class="number">1</span>), </span><br><span class="line">                                    p=[signal_pct, </span><br><span class="line">                                    noise_pct/<span class="number">2.</span>, </span><br><span class="line">                                    noise_pct/<span class="number">2.</span>])</span><br><span class="line">            mask = np.repeat(mask, c, axis=<span class="number">2</span>)</span><br><span class="line">            img_[mask == <span class="number">1</span>] = <span class="number">255</span>   <span class="comment"># 盐噪声</span></span><br><span class="line">            img_[mask == <span class="number">2</span>] = <span class="number">0</span>     <span class="comment"># 椒噪声</span></span><br><span class="line">            <span class="keyword">return</span> Image.fromarray(img_.astype(<span class="string">'uint8'</span>)).convert(<span class="string">'RGB'</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> img</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">train_transform = transforms.Compose([</span><br><span class="line">    transforms.Resize((<span class="number">224</span>, <span class="number">224</span>)),</span><br><span class="line">    AddPepperNoise(<span class="number">0.9</span>, p=<span class="number">0.5</span>),<span class="comment">#接受PIL文件，返回PIL文件</span></span><br><span class="line">    transforms.ToTensor(),</span><br><span class="line">    transforms.Normalize(norm_mean, norm_std),</span><br><span class="line">])</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="1-7总结"><a href="#1-7总结" class="headerlink" title="1.7总结"></a>1.7总结</h3><p><img src="/2022/06/29/pytorch%E6%97%A5%E7%A7%AF%E6%9C%88%E7%B4%AF6-pytorch%E6%95%B0%E6%8D%AE%E9%A2%84%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6/image-20200821000030886.png" alt="image-20200821000030886"></p>
+<p>数据增强原则：让训练集与测试集更接近</p>
+<p>• 空间位置<strong>：平移</strong></p>
+<p>• 色彩<strong>：灰度图，色彩抖动</strong></p>
+<p>• 形状<strong>：仿射变换</strong></p>
+<p>• 上下文场景<strong>：遮挡，填充</strong></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E7%BC%96%E7%A8%8B/">🏷️编程</a>
+                    
+                        <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">🏷️深度学习</a>
+                    
+                        <a href="/tags/Pytorch/">🏷️Pytorch</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2022/06/30/pytorch%E6%97%A5%E7%A7%AF%E6%9C%88%E7%B4%AF7-%E6%A8%A1%E5%9E%8B%E5%BB%BA%E7%AB%8B/">pytorch日积月累-模型建立</a>
+            
+            
+            <a class="next" rel="next" href="/2022/06/29/pytorch%E6%97%A5%E7%A7%AF%E6%9C%88%E7%B4%AF5-pytorch%E6%95%B0%E6%8D%AE%E8%AF%BB%E5%8F%96%E6%9C%BA%E5%88%B6/">pytorch日积月累-pytorch数据读取机制</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 尹祺翔 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

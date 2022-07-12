@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="尹祺翔">
+
+
+
+
+
+<title>VGG模型笔记 | yqxBlog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+            <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.2">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">BUPTyqx&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">BUPTyqx&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">VGG模型笔记</h1>
+            
+                <div class="post-meta">
+                    
+                        🦹‍♀️作者: <a itemprop="author" rel="author" href="/">尹祺翔</a><br>
+                    
+
+                    
+                        <span class="post-time">
+                        ⏲️时间: <a href="#">July 2, 2022&nbsp;&nbsp;17:20:52</a><br>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                            📒目录:
+                            
+                                <a href="/categories/CVBaseline/">CVBaseline</a><br>
+                            
+                        </span>
+                    
+                    
+                    
+                        <span class="post-count">
+                            📑字数:
+                        <a href="">3,159</a><br>  
+                        </span>
+                    
+                    
+                        <span class="post-count">
+                    ⏰预计阅读时间:
+                        <a href="">14min</a>  
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="CVbaseline-VGG"><a href="#CVbaseline-VGG" class="headerlink" title="CVbaseline-VGG"></a>CVbaseline-VGG</h1><p><strong>VERY DEEP CONVOLUTIONAL NETWORKS FOR LARGE-SCALE IMAGE RECOGNITION</strong></p>
+<h2 id="1-论文研究背景、成果及意义"><a href="#1-论文研究背景、成果及意义" class="headerlink" title="1.论文研究背景、成果及意义"></a>1.论文研究背景、成果及意义</h2><p><strong>ILSVRC</strong>：大规模图像识别挑战赛</p>
+<p>ImageNet Large Scale Visual Recognition Challenge 是李飞飞等人于2010年创办的图像识别挑战赛，自2010起连续举办8年，极大地<strong>推动计算机视觉发展</strong></p>
+<p>比赛项目涵盖：图像分类(Classification)、目标定位(Object localization)、目标检测(Object detection)、视频目标检测(Object detection from video)、场景分类(Scene classification)、场景解析(Scene parsing)</p>
+<p>竞赛中脱颖而出大量经典模型： <strong>alexnet</strong>，<strong>vgg，googlenet，resnet，densenet</strong>等</p>
+<p>1.AlexNet：ILSVRC-2012分类冠军，里程碑的CNN模型</p>
+<p>2.ZFNet： ILSVRC-2013分类冠军方法，对AlexNet改进</p>
+<p>3.OverFeat：ILSVRC-2013定位冠军，集分类、定位和检测于一体的卷积网络方法</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th><strong>模型</strong></th>
+<th><strong>时间</strong></th>
+<th><strong>top-5-error</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AlexNet</td>
+<td>2012</td>
+<td>15.3%</td>
+</tr>
+<tr>
+<td>ZFNet</td>
+<td>2013</td>
+<td>13.5%</td>
+</tr>
+<tr>
+<td>VGG</td>
+<td>2014</td>
+<td>7.3%</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>相关研究</strong></p>
+<p>1.AlexNet：ILSVRC-2012分类冠军，里程碑的CNN模型 </p>
+<p><img src="/2022/07/02/VGG%E7%AC%94%E8%AE%B0/image-20200814233312840-1613983776660.png" alt="image-20200814233312840"></p>
+<p>2.ZFNet： ILSVRC-2013分类冠军方法，对AlexNet改进(改变了超参数的设置)。卷积核的数目更小，对AlexNet进行参数的改进，具体改进如图所示：</p>
+<p><img src="/2022/07/02/VGG%E7%AC%94%E8%AE%B0/image-20200814233337197.png" alt="image-20200814233337197" style="zoom:100%;"></p>
+<p>3.OverFeat：ILSVRC-2013定位冠军，集分类、定位和检测于一体的卷积网络方法，提出了全卷积的方式进行参数的预测。<strong>（全卷积）</strong></p>
+<blockquote>
+<p>可以在一次运算内实现多裁剪。【只需要输入一张图片】</p>
+</blockquote>
+<p><img src="/2022/07/02/VGG%E7%AC%94%E8%AE%B0/image-20200814233358686.png" alt="image-20200814233358686" style="zoom:100%;"></p>
+<blockquote>
+<p>1.AlexNet：借鉴卷积模型结构</p>
+<p>2.ZFNet： 借鉴其采用小卷积核思想</p>
+<p>3.OverFeat：借鉴全卷积，实现高效的稠密（Dense）预测</p>
+<p>4.NIN：尝试$1*1$卷积（network in network）</p>
+</blockquote>
+<p><strong>VGG-ILSVRC</strong>成绩</p>
+<p>VGG：定位第一名，分类第二名</p>
+<p>GoogLeNet：分类第一名，定位第二名</p>
+<p><img src="/2022/07/02/VGG%E7%AC%94%E8%AE%B0/image-20200814233933891.png" alt="image-20200814233933891" style="zoom:100%;"></p>
+<p><strong>研究意义</strong></p>
+<p>1.开启<strong>小卷积核</strong>时代：$3*3$卷积核成为主流模型</p>
+<p>2.作为各类图像任务的<strong>骨干网络</strong>结构：分类、定位、检测、分割一系列图像任务大都有VGG为骨干网络的尝试。</p>
+<h2 id="2-摘要核心"><a href="#2-摘要核心" class="headerlink" title="2.摘要核心"></a>2.摘要核心</h2><ul>
+<li><p><strong>本文主题：</strong>在大规模图像识别任务中，探究<strong>卷积网络深度</strong>对分类准确率的影响</p>
+</li>
+<li><p><strong>主要工作：</strong>研究<strong><script type="math/tex">3*3</script></strong>卷积核增加网络模型深度的卷积网络的识别性能，同时将模型加深到<strong>16-19层</strong></p>
+</li>
+<li><p><strong>本文成绩：</strong>VGG在ILSVRC-2014获得了定位任务冠军和分类任务亚军</p>
+</li>
+<li><p><strong>泛化能力：</strong>VGG不仅在ILSVRC获得好成绩，在别的数据集中表现依旧优异</p>
+</li>
+<li><p><strong>开源贡献：</strong>开源两个最优模型，以加速计算机视觉中深度特征表示的进一步研究</p>
+</li>
+</ul>
+<h2 id="3-VGG结构"><a href="#3-VGG结构" class="headerlink" title="3.VGG结构"></a>3.VGG结构</h2><p><strong>共性：</strong></p>
+<ul>
+<li><p>5个maxpool池化层，降低分辨率。</p>
+</li>
+<li><p>maxpool后，特征图通道数翻倍直至512。</p>
+</li>
+<li><p>3个FC层进行分类输出。</p>
+</li>
+<li><p>maxpool之间采用多个卷积层堆叠，<strong>对特征进行提取和抽象。</strong></p>
+</li>
+</ul>
+<p><img src="/2022/07/02/VGG%E7%AC%94%E8%AE%B0/02-ppt-vgg-02-4.9-1613983776660.png" alt="02-ppt-vgg-02-4.9"></p>
+<p><strong>演变过程：</strong></p>
+<blockquote>
+<ul>
+<li>A：$1\times1$层卷积</li>
+<li>A-LRN：基于A增加一个LRN</li>
+<li>B： 第1，2个block中增加1个卷积$3\times3$卷积</li>
+<li>C：第3， 4， 5个block分别增加1个$1\times1$卷积，增加了模型的非线性能力，$1\times1$卷积的思路来自于NIN，表明增加非线性有益于指标提升</li>
+<li>D（VGG16）：第3， 4， 5个block的$1\times1$卷积替换为$3\times3$，</li>
+<li>E（VGG19）：第3， 4， 5个block再分别增加1个$3\times3$卷积</li>
+</ul>
+</blockquote>
+<p><strong>参数设置：</strong></p>
+<p>模型改进过程中，参数量并没有明显的变化：</p>
+<p>原因：FC（全连接层）占据主要的参数，之前的层数增加对总参数的影响比较小。</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>Network</th>
+<th>A A-LRN</th>
+<th>B</th>
+<th>C</th>
+<th>D</th>
+<th>E</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Number of parameters</td>
+<td>133</td>
+<td>133</td>
+<td>134</td>
+<td>138</td>
+<td>144</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>VGG16</strong>结构：</p>
+<p><img src="/2022/07/02/VGG%E7%AC%94%E8%AE%B0/image-20200815001529821.png" alt="image-20200815001529821" style="zoom:87%;"></p>
+<p><img src="/2022/07/02/VGG%E7%AC%94%E8%AE%B0/image-20200815001618839.png" alt="image-20200815001618839" style="zoom:80%;"></p>
+<h2 id="4-VGG特点"><a href="#4-VGG特点" class="headerlink" title="4.VGG特点"></a>4.VGG特点</h2><p>(1)堆叠$3*3$卷积核</p>
+<ul>
+<li>增大感受野，2个$3\times3$堆叠等价于1个$5\times5$，如图所示：</li>
+</ul>
+<p><img src="/2022/07/02/VGG%E7%AC%94%E8%AE%B0/image-20200815001806507.png" alt="image-20200815001806507" style="zoom:80%;"></p>
+<p>3个$3\times3$堆叠等价于1个$7\times7$</p>
+<p><img src="/2022/07/02/VGG%E7%AC%94%E8%AE%B0/image-20200815001933728.png" alt="image-20200815001933728" style="zoom:80%;"></p>
+<ul>
+<li>增加非线性激活函数，增加特征抽象能力</li>
+<li>减少训练参数</li>
+<li>可看成$7\times7$卷积核的正则化，强迫$7\times7$分解为$3\times3$</li>
+</ul>
+<blockquote>
+<p>假设输入，输出均为$C$个通道：</p>
+<ul>
+<li>一个$7\times7$卷积核所需要的参数量：$7\times7\times c\times c=49C^2$</li>
+<li>三个$3\times3$卷积核所需要的参数量：$3\times(3\times3\times C\times C)=27C^2$</li>
+<li>参数减少比：44%</li>
+</ul>
+<p><img src="/2022/07/02/VGG%E7%AC%94%E8%AE%B0/image-20220702213847840.png" alt="image-20220702213847840"></p>
+</blockquote>
+<p>(2)尝试<script type="math/tex">1*1</script>卷积：借鉴NIN，引入利用<script type="math/tex">1*1</script>卷积，增加非线性激活函数，提升模型效果。</p>
+<p><img src="/2022/07/02/VGG%E7%AC%94%E8%AE%B0/image-20220702213859124.png" alt="image-20220702213859124"></p>
+<h2 id="5-训练技巧"><a href="#5-训练技巧" class="headerlink" title="5.训练技巧"></a>5.训练技巧</h2><h3 id="5-1尺度扰动"><a href="#5-1尺度扰动" class="headerlink" title="5.1尺度扰动"></a>5.1尺度扰动</h3><p><strong>数据增强</strong> </p>
+<p>方法一：针对位置/尺寸</p>
+<p>训练阶段： </p>
+<ul>
+<li>按比例缩放图片至最小边为$S$ </li>
+<li>随机位置裁剪出$224*224$区域 </li>
+<li>随机进行水平翻转 </li>
+</ul>
+<p>方法二：针对颜色 </p>
+<p>修改RGB通道的像素值，实现颜色扰动 </p>
+<p><strong>S设置方法</strong>： </p>
+<p>1.固定值：固定为256，或384 </p>
+<p><img src="/2022/07/02/VGG%E7%AC%94%E8%AE%B0/绘图1.png" alt="绘图1"></p>
+<p>2.随机值：每个batch的$S$在[256, 512]，实现尺度扰动（multi-scale training）</p>
+<h3 id="5-2预训练模型"><a href="#5-2预训练模型" class="headerlink" title="5.2预训练模型"></a>5.2预训练模型</h3><p><strong>预训练模型初始化</strong> </p>
+<p>深度神经网络对初始化敏感 </p>
+<p>1.深度加深时，用浅层网络初始化：B，C，D，E用A模型初始化  </p>
+<p>2.Multi-scale训练时，用小尺度初始化</p>
+<ul>
+<li>$S=384$时，用$S=256$模型初始化 </li>
+<li>$S=[256, 512]$时，用$S=384$模型初始化</li>
+</ul>
+<p>3.直接使用Xavier初始化方法。</p>
+<h2 id="6-测试技巧"><a href="#6-测试技巧" class="headerlink" title="6.测试技巧"></a>6.测试技巧</h2><blockquote>
+<p>多尺度测试：</p>
+<p>图片等比例缩放至最短边为$Q$，设置三个$Q$，对图片进行预测，取平均值。</p>
+<p>方法1：当$S$为固定值时，$Q=[S-32,S,S+32]$</p>
+<p>方法2：当$S$为随机值时，$Q=[S_{\min},0.5\times(S_{\min}+S_{\max}),S_{\max}]$</p>
+<p><img src="/2022/07/02/VGG%E7%AC%94%E8%AE%B0/绘图2.png" alt="绘图2"></p>
+</blockquote>
+<h3 id="6-1Dense测试"><a href="#6-1Dense测试" class="headerlink" title="6.1Dense测试"></a>6.1Dense测试</h3><p><strong>稠密测试（Dense test）</strong>：将FC层转换为卷积操作，变为全卷积网络，实现任意尺寸图片输入。</p>
+<p><img src="/2022/07/02/VGG%E7%AC%94%E8%AE%B0/image-20200814233358686.png" alt="image-20200814233358686" style="zoom:100%;"></p>
+<ul>
+<li>经过全卷积网络得到 $N\times N\times1000$ 特征图 </li>
+<li>在通道维度上求和（sum pool）计算平均值， 得到$1\times1000$ 输出向量(在上图中，下面这种情况，最后会在$2\times2\times1000$上进行平均得到$1\times1\times1000$)。</li>
+</ul>
+<p><img src="/2022/07/02/VGG%E7%AC%94%E8%AE%B0/绘图3.png" alt="绘图3"></p>
+<h3 id="6-2Multi-crop测试"><a href="#6-2Multi-crop测试" class="headerlink" title="6.2Multi-crop测试"></a>6.2Multi-crop测试</h3><p><strong>Multi-Crop测试</strong> ：借鉴AlexNet与GoogLeNet，对图片进行Multi-crop，裁剪大小为$224\times224$，并水平翻转1张图，缩放至3种尺寸，然后每种尺寸裁剪出50张图片50 = $5\times5\times2$</p>
+<blockquote>
+<p><strong>多尺度测试：</strong></p>
+<p>step1：等比例缩放图像至三种尺寸， $Q_1,Q_2,Q_3$</p>
+<p>step2：</p>
+<p>方法1 Dense：全卷积，sum pool，得到$1*1000$ </p>
+<p>方法2 Multi-crop：多个位置裁剪$224\times224$区域 </p>
+<p>方法3 Multi-crop &amp; Dense：综合取平均</p>
+</blockquote>
+<h2 id="7-结果分析"><a href="#7-结果分析" class="headerlink" title="7.结果分析"></a>7.结果分析</h2><p><strong>1.Single scale evaluation </strong></p>
+<p>结论： </p>
+<ul>
+<li>误差随深度加深而降低，当模型到达19层时，误差饱和，不再下降</li>
+<li>增加$1*1$有助于性能提升 </li>
+<li>训练时加入<strong>尺度扰动</strong>，有助于性能提升 </li>
+<li>B模型中，$3\times3$替换为$5\times5$卷积，top1下降7%</li>
+</ul>
+<p><strong>2.Multi scale evaluation</strong></p>
+<p>方法1 : $Q = [S-32, S, S+32]$ </p>
+<p>方法2：$Q = (S_\min, 0.5\times(S_\min + S_\max), S_\max)$ </p>
+<p>结论：测试时采用Scale jittering有助于性能提升。</p>
+<p><strong>3.Multi crop evaluation </strong></p>
+<p>方法: 等步长的滑动$224\times224$的窗口进行裁剪，在尺度为Q的图像上裁剪$5\times5=25$张图片，然后再进 行水平翻转，得到50张图片，结合三个$Q$值，一张图片得到150张图片输入到模型中。</p>
+<p>结论：</p>
+<ul>
+<li>multi-crop由于Dense</li>
+<li>multi-crop结合Dense，可以形成互补，达到最优效果。</li>
+</ul>
+<p><strong>4.Convnet fusion</strong></p>
+<p>ILSVRC中提交的模型为7个模型融合 </p>
+<p>采用最优的两个模型 </p>
+<ul>
+<li>D/[256,512]/256,384,512 </li>
+<li>E/[256,512]/256,384,512 </li>
+</ul>
+<p>结合multi-crop和dense,得到最优结果。</p>
+<h2 id="8-总结"><a href="#8-总结" class="headerlink" title="8.总结"></a>8.总结</h2><blockquote>
+<ul>
+<li>采用小卷积核，获得高精度</li>
+<li>采用多尺度及稠密预测，获得高精度</li>
+<li>$1\times1$卷积可认为是线性变换，同时增加非线性层</li>
+<li>填充大小准则：保持卷积后特征图分辨率不变</li>
+<li>LRN对精度无提升</li>
+<li>Xavier初始化可达较好效果</li>
+<li>$S$远大于224，图片可能仅包含物体的一部分</li>
+<li>大尺度模型采用小尺度模型初始化，可加快收敛 </li>
+<li>物体尺寸不一，因此采用多尺度训练，可以提高精度</li>
+<li>multi crop 存在重复计算，因而低效</li>
+<li>multi crop可看成dense的补充，因为它们边界处理有所不同</li>
+<li>小而深的卷积网络优于大而浅的卷积网络 </li>
+<li>尺度扰动对训练和测试阶段有帮助 </li>
+</ul>
+</blockquote>
+<h2 id="9-核心代码实现"><a href="#9-核心代码实现" class="headerlink" title="9.核心代码实现"></a>9.核心代码实现</h2><p>pytorch中的VGG定义</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line"><span class="comment"># 类定义</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">VGG</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, features, num_classes=<span class="number">1000</span>, init_weights=<span class="literal">True</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(VGG, self).__init__()</span><br><span class="line">        self.features = features                     <span class="comment"># 核心：特征提取</span></span><br><span class="line">        self.avgpool = nn.AdaptiveAvgPool2d((<span class="number">7</span>, <span class="number">7</span>))  <span class="comment"># 自适应池化至7*7</span></span><br><span class="line">        self.classifier = nn.Sequential(             <span class="comment"># 分类器</span></span><br><span class="line">            nn.Linear(<span class="number">512</span> * <span class="number">7</span> * <span class="number">7</span>, <span class="number">4096</span>),</span><br><span class="line">            nn.ReLU(<span class="literal">True</span>),</span><br><span class="line">            nn.Dropout(),</span><br><span class="line">            nn.Linear(<span class="number">4096</span>, <span class="number">4096</span>),</span><br><span class="line">            nn.ReLU(<span class="literal">True</span>),</span><br><span class="line">            nn.Dropout(),</span><br><span class="line">            nn.Linear(<span class="number">4096</span>, num_classes),</span><br><span class="line">        )</span><br><span class="line">        <span class="keyword">if</span> init_weights:</span><br><span class="line">            self._initialize_weights()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        x = self.features(x)      <span class="comment"># 卷积+池化（进行一系列特征提取） </span></span><br><span class="line">        x = self.avgpool(x)       <span class="comment"># 自适应的池化</span></span><br><span class="line">        x = torch.flatten(x, <span class="number">1</span>)   <span class="comment"># 拉平为向量</span></span><br><span class="line">        x = self.classifier(x)    <span class="comment"># 一系列FC层的堆叠</span></span><br><span class="line">        <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_initialize_weights</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">for</span> m <span class="keyword">in</span> self.modules():</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">isinstance</span>(m, nn.Conv2d):</span><br><span class="line">                nn.init.kaiming_normal_(m.weight, mode=<span class="string">'fan_out'</span>, nonlinearity=<span class="string">'relu'</span>)</span><br><span class="line">                <span class="keyword">if</span> m.bias <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">                    nn.init.constant_(m.bias, <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">elif</span> <span class="built_in">isinstance</span>(m, nn.BatchNorm2d):</span><br><span class="line">                nn.init.constant_(m.weight, <span class="number">1</span>)</span><br><span class="line">                nn.init.constant_(m.bias, <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">elif</span> <span class="built_in">isinstance</span>(m, nn.Linear):</span><br><span class="line">                nn.init.normal_(m.weight, <span class="number">0</span>, <span class="number">0.01</span>)</span><br><span class="line">                nn.init.constant_(m.bias, <span class="number">0</span>)</span><br></pre></td></tr></tbody></table></figure>
+<p>VGG16的定义：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">_vgg</span>(<span class="params">arch, cfg, batch_norm, pretrained, progress, **kwargs</span>):</span><br><span class="line">    <span class="keyword">if</span> pretrained:</span><br><span class="line">        kwargs[<span class="string">'init_weights'</span>] = <span class="literal">False</span></span><br><span class="line">    model = VGG(make_layers(cfgs[cfg], batch_norm=batch_norm), **kwargs)  </span><br><span class="line">    <span class="comment"># 调用VGG类，进行实例化，核心在make_layers</span></span><br><span class="line">    <span class="keyword">if</span> pretrained:</span><br><span class="line">        state_dict = load_state_dict_from_url(model_urls[arch],progress=progress)</span><br><span class="line">        model.load_state_dict(state_dict)</span><br><span class="line">    <span class="keyword">return</span> model</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">vgg16</span>(<span class="params">pretrained=<span class="literal">False</span>, progress=<span class="literal">True</span>, **kwargs</span>):</span><br><span class="line">    <span class="keyword">return</span> _vgg(<span class="string">'vgg16'</span>, <span class="string">'D'</span>, <span class="literal">False</span>, pretrained, progress, **kwargs)</span><br><span class="line">    <span class="comment"># 通过传入参数，对VGG进行实例化</span></span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">make_layers</span>(<span class="params">cfg, batch_norm=<span class="literal">False</span></span>):<span class="comment">#定义各个层</span></span><br><span class="line">    layers = []</span><br><span class="line">    in_channels = <span class="number">3</span></span><br><span class="line">    <span class="keyword">for</span> v <span class="keyword">in</span> cfg:</span><br><span class="line">        <span class="keyword">if</span> v == <span class="string">'M'</span>:</span><br><span class="line">            layers += [nn.MaxPool2d(kernel_size=<span class="number">2</span>, stride=<span class="number">2</span>)]</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            conv2d = nn.Conv2d(in_channels, v, kernel_size=<span class="number">3</span>, padding=<span class="number">1</span>)</span><br><span class="line">            <span class="keyword">if</span> batch_norm:<span class="comment">#加入BN</span></span><br><span class="line">                layers += [conv2d, nn.BatchNorm2d(v), nn.ReLU(inplace=<span class="literal">True</span>)]</span><br><span class="line">            <span class="keyword">else</span>:<span class="comment">#卷积层+激活函数</span></span><br><span class="line">                layers += [conv2d, nn.ReLU(inplace=<span class="literal">True</span>)]</span><br><span class="line">            in_channels = v</span><br><span class="line">    <span class="keyword">return</span> nn.Sequential(*layers)<span class="comment">#利用容器生成全部的网络层</span></span><br><span class="line"><span class="comment"># 各种VGG的定义</span></span><br><span class="line">cfgs = {</span><br><span class="line">    <span class="string">'A'</span>: [<span class="number">64</span>,     <span class="string">'M'</span>, <span class="number">128</span>,      <span class="string">'M'</span>, <span class="number">256</span>, <span class="number">256</span>,           <span class="string">'M'</span>, <span class="number">512</span>, <span class="number">512</span>,           <span class="string">'M'</span>, <span class="number">512</span>, <span class="number">512</span>,           <span class="string">'M'</span>],</span><br><span class="line">    <span class="string">'B'</span>: [<span class="number">64</span>, <span class="number">64</span>, <span class="string">'M'</span>, <span class="number">128</span>, <span class="number">128</span>, <span class="string">'M'</span>, <span class="number">256</span>, <span class="number">256</span>,           <span class="string">'M'</span>, <span class="number">512</span>, <span class="number">512</span>,           <span class="string">'M'</span>, <span class="number">512</span>, <span class="number">512</span>,           <span class="string">'M'</span>],</span><br><span class="line">    <span class="string">'D'</span>: [<span class="number">64</span>, <span class="number">64</span>, <span class="string">'M'</span>, <span class="number">128</span>, <span class="number">128</span>, <span class="string">'M'</span>, <span class="number">256</span>, <span class="number">256</span>, <span class="number">256</span>,      <span class="string">'M'</span>, <span class="number">512</span>, <span class="number">512</span>, <span class="number">512</span>,      <span class="string">'M'</span>, <span class="number">512</span>, <span class="number">512</span>, <span class="number">512</span>,      <span class="string">'M'</span>],</span><br><span class="line">    <span class="string">'E'</span>: [<span class="number">64</span>, <span class="number">64</span>, <span class="string">'M'</span>, <span class="number">128</span>, <span class="number">128</span>, <span class="string">'M'</span>, <span class="number">256</span>, <span class="number">256</span>, <span class="number">256</span>, <span class="number">256</span>, <span class="string">'M'</span>, <span class="number">512</span>, <span class="number">512</span>, <span class="number">512</span>, <span class="number">512</span>, <span class="string">'M'</span>, <span class="number">512</span>, <span class="number">512</span>, <span class="number">512</span>, <span class="number">512</span>, <span class="string">'M'</span>],}</span><br></pre></td></tr></tbody></table></figure>
+<p>定义网络结构：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">vgg16_model = vgg16()</span><br><span class="line">fake_data = torch.randn((<span class="number">4</span>, <span class="number">3</span>, <span class="number">224</span>, <span class="number">224</span>))  </span><br><span class="line"><span class="comment"># fake_data = torch.randn((1, 3, 256, 256))  # (256, 256)</span></span><br><span class="line">outputs = vgg16_model(fake_data)</span><br><span class="line"><span class="built_in">print</span>(outputs, outputs.shape)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/02/VGG%E7%AC%94%E8%AE%B0/image-20220703012024734.png" alt="image-20220703012024734"></p>
+<p>可以观察到VGG的网络结构：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">VGG(</span><br><span class="line">  (features): Sequential(</span><br><span class="line">    (<span class="number">0</span>): Conv2d(<span class="number">3</span>, <span class="number">64</span>, kernel_size=(<span class="number">3</span>, <span class="number">3</span>), stride=(<span class="number">1</span>, <span class="number">1</span>), padding=(<span class="number">1</span>, <span class="number">1</span>))</span><br><span class="line">    (<span class="number">1</span>): ReLU(inplace=<span class="literal">True</span>)</span><br><span class="line">    (<span class="number">2</span>): Conv2d(<span class="number">64</span>, <span class="number">64</span>, kernel_size=(<span class="number">3</span>, <span class="number">3</span>), stride=(<span class="number">1</span>, <span class="number">1</span>), padding=(<span class="number">1</span>, <span class="number">1</span>))</span><br><span class="line">    (<span class="number">3</span>): ReLU(inplace=<span class="literal">True</span>)</span><br><span class="line">    (<span class="number">4</span>): MaxPool2d(kernel_size=<span class="number">2</span>, stride=<span class="number">2</span>, padding=<span class="number">0</span>, dilation=<span class="number">1</span>, ceil_mode=<span class="literal">False</span>)</span><br><span class="line">    (<span class="number">5</span>): Conv2d(<span class="number">64</span>, <span class="number">128</span>, kernel_size=(<span class="number">3</span>, <span class="number">3</span>), stride=(<span class="number">1</span>, <span class="number">1</span>), padding=(<span class="number">1</span>, <span class="number">1</span>))</span><br><span class="line">    (<span class="number">6</span>): ReLU(inplace=<span class="literal">True</span>)</span><br><span class="line">    (<span class="number">7</span>): Conv2d(<span class="number">128</span>, <span class="number">128</span>, kernel_size=(<span class="number">3</span>, <span class="number">3</span>), stride=(<span class="number">1</span>, <span class="number">1</span>), padding=(<span class="number">1</span>, <span class="number">1</span>))</span><br><span class="line">    (<span class="number">8</span>): ReLU(inplace=<span class="literal">True</span>)</span><br><span class="line">    (<span class="number">9</span>): MaxPool2d(kernel_size=<span class="number">2</span>, stride=<span class="number">2</span>, padding=<span class="number">0</span>, dilation=<span class="number">1</span>, ceil_mode=<span class="literal">False</span>)</span><br><span class="line">    (<span class="number">10</span>): Conv2d(<span class="number">128</span>, <span class="number">256</span>, kernel_size=(<span class="number">3</span>, <span class="number">3</span>), stride=(<span class="number">1</span>, <span class="number">1</span>), padding=(<span class="number">1</span>, <span class="number">1</span>))</span><br><span class="line">    (<span class="number">11</span>): ReLU(inplace=<span class="literal">True</span>)</span><br><span class="line">    (<span class="number">12</span>): Conv2d(<span class="number">256</span>, <span class="number">256</span>, kernel_size=(<span class="number">3</span>, <span class="number">3</span>), stride=(<span class="number">1</span>, <span class="number">1</span>), padding=(<span class="number">1</span>, <span class="number">1</span>))</span><br><span class="line">    (<span class="number">13</span>): ReLU(inplace=<span class="literal">True</span>)</span><br><span class="line">    (<span class="number">14</span>): Conv2d(<span class="number">256</span>, <span class="number">256</span>, kernel_size=(<span class="number">3</span>, <span class="number">3</span>), stride=(<span class="number">1</span>, <span class="number">1</span>), padding=(<span class="number">1</span>, <span class="number">1</span>))</span><br><span class="line">    (<span class="number">15</span>): ReLU(inplace=<span class="literal">True</span>)</span><br><span class="line">    (<span class="number">16</span>): MaxPool2d(kernel_size=<span class="number">2</span>, stride=<span class="number">2</span>, padding=<span class="number">0</span>, dilation=<span class="number">1</span>, ceil_mode=<span class="literal">False</span>)</span><br><span class="line">    (<span class="number">17</span>): Conv2d(<span class="number">256</span>, <span class="number">512</span>, kernel_size=(<span class="number">3</span>, <span class="number">3</span>), stride=(<span class="number">1</span>, <span class="number">1</span>), padding=(<span class="number">1</span>, <span class="number">1</span>))</span><br><span class="line">    (<span class="number">18</span>): ReLU(inplace=<span class="literal">True</span>)</span><br><span class="line">    (<span class="number">19</span>): Conv2d(<span class="number">512</span>, <span class="number">512</span>, kernel_size=(<span class="number">3</span>, <span class="number">3</span>), stride=(<span class="number">1</span>, <span class="number">1</span>), padding=(<span class="number">1</span>, <span class="number">1</span>))</span><br><span class="line">    (<span class="number">20</span>): ReLU(inplace=<span class="literal">True</span>)</span><br><span class="line">    (<span class="number">21</span>): Conv2d(<span class="number">512</span>, <span class="number">512</span>, kernel_size=(<span class="number">3</span>, <span class="number">3</span>), stride=(<span class="number">1</span>, <span class="number">1</span>), padding=(<span class="number">1</span>, <span class="number">1</span>))</span><br><span class="line">    (<span class="number">22</span>): ReLU(inplace=<span class="literal">True</span>)</span><br><span class="line">    (<span class="number">23</span>): MaxPool2d(kernel_size=<span class="number">2</span>, stride=<span class="number">2</span>, padding=<span class="number">0</span>, dilation=<span class="number">1</span>, ceil_mode=<span class="literal">False</span>)</span><br><span class="line">    (<span class="number">24</span>): Conv2d(<span class="number">512</span>, <span class="number">512</span>, kernel_size=(<span class="number">3</span>, <span class="number">3</span>), stride=(<span class="number">1</span>, <span class="number">1</span>), padding=(<span class="number">1</span>, <span class="number">1</span>))</span><br><span class="line">    (<span class="number">25</span>): ReLU(inplace=<span class="literal">True</span>)</span><br><span class="line">    (<span class="number">26</span>): Conv2d(<span class="number">512</span>, <span class="number">512</span>, kernel_size=(<span class="number">3</span>, <span class="number">3</span>), stride=(<span class="number">1</span>, <span class="number">1</span>), padding=(<span class="number">1</span>, <span class="number">1</span>))</span><br><span class="line">    (<span class="number">27</span>): ReLU(inplace=<span class="literal">True</span>)</span><br><span class="line">    (<span class="number">28</span>): Conv2d(<span class="number">512</span>, <span class="number">512</span>, kernel_size=(<span class="number">3</span>, <span class="number">3</span>), stride=(<span class="number">1</span>, <span class="number">1</span>), padding=(<span class="number">1</span>, <span class="number">1</span>))</span><br><span class="line">    (<span class="number">29</span>): ReLU(inplace=<span class="literal">True</span>)</span><br><span class="line">    (<span class="number">30</span>): MaxPool2d(kernel_size=<span class="number">2</span>, stride=<span class="number">2</span>, padding=<span class="number">0</span>, dilation=<span class="number">1</span>, ceil_mode=<span class="literal">False</span>)</span><br><span class="line">  )</span><br><span class="line">  (avgpool): AdaptiveAvgPool2d(output_size=(<span class="number">7</span>, <span class="number">7</span>))</span><br><span class="line">  (classifier): Sequential(</span><br><span class="line">    (<span class="number">0</span>): Linear(in_features=<span class="number">25088</span>, out_features=<span class="number">4096</span>, bias=<span class="literal">True</span>)</span><br><span class="line">    (<span class="number">1</span>): ReLU(inplace=<span class="literal">True</span>)</span><br><span class="line">    (<span class="number">2</span>): Dropout(p=<span class="number">0.5</span>, inplace=<span class="literal">False</span>)</span><br><span class="line">    (<span class="number">3</span>): Linear(in_features=<span class="number">4096</span>, out_features=<span class="number">4096</span>, bias=<span class="literal">True</span>)</span><br><span class="line">    (<span class="number">4</span>): ReLU(inplace=<span class="literal">True</span>)</span><br><span class="line">    (<span class="number">5</span>): Dropout(p=<span class="number">0.5</span>, inplace=<span class="literal">False</span>)</span><br><span class="line">    (<span class="number">6</span>): Linear(in_features=<span class="number">4096</span>, out_features=<span class="number">1000</span>, bias=<span class="literal">True</span>)</span><br><span class="line">  )</span><br><span class="line">)</span><br></pre></td></tr></tbody></table></figure>
+<p>使用<code>torchvision</code>可以方便的定义VGG网络，甚至可以修改某一层的结构：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torchvision.models <span class="keyword">as</span> models</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_vgg16</span>(<span class="params">path_state_dict, device, vis_model=<span class="literal">False</span></span>):</span><br><span class="line">    model = models.vgg16()  <span class="comment">#torchvision.models中的VGG函数</span></span><br><span class="line">    pretrained_state_dict = torch.load(path_state_dict)</span><br><span class="line">    model.load_state_dict(pretrained_state_dict)</span><br><span class="line">    model.<span class="built_in">eval</span>()</span><br><span class="line">    <span class="keyword">if</span> vis_model:</span><br><span class="line">        <span class="keyword">from</span> torchsummary <span class="keyword">import</span> summary</span><br><span class="line">        summary(model, input_size=(<span class="number">3</span>, <span class="number">224</span>, <span class="number">224</span>), device=<span class="string">"cpu"</span>)</span><br><span class="line">    model.to(device)</span><br><span class="line">    <span class="keyword">return</span> model</span><br><span class="line"><span class="comment"># 模型</span></span><br><span class="line">path_state_dict = os.path.join(BASE_DIR, <span class="string">"Data"</span>, <span class="string">"vgg16-397923af.pth"</span>)</span><br><span class="line">vgg16_model = get_vgg16(path_state_dict, device, <span class="literal">False</span>)</span><br><span class="line"><span class="comment"># 修改模型中的某一层</span></span><br><span class="line">num_ftrs = vgg16_model.classifier._modules[<span class="string">"6"</span>].in_features</span><br><span class="line">vgg16_model.classifier._modules[<span class="string">"6"</span>] = nn.Linear(num_ftrs, num_classes)</span><br><span class="line">vgg16_model.to(device)</span><br></pre></td></tr></tbody></table></figure>
+<h2 id="附：论文原文"><a href="#附：论文原文" class="headerlink" title="附：论文原文"></a>附：论文原文</h2>
+
+	<div class="row">
+    <embed src="VGG.pdf" width="100%" height="550" type="application/pdf">
+	</div>
+
+
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">🏷️计算机视觉</a>
+                    
+                        <a href="/tags/%E7%BC%96%E7%A8%8B/">🏷️编程</a>
+                    
+                        <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">🏷️深度学习</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2022/07/02/Transformer-Uformer%E6%A8%A1%E5%9E%8B/">图像复原中的应用--Uformer</a>
+            
+            
+            <a class="next" rel="next" href="/2022/06/30/pytorch%E6%97%A5%E7%A7%AF%E6%9C%88%E7%B4%AF11-%E5%AD%A6%E4%B9%A0%E7%8E%87/">pytorch日积月累-学习率</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 尹祺翔 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="尹祺翔">
+
+
+
+
+
+<title>GoogleNet V1-V4模型笔记 | yqxBlog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+            <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.2">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">BUPTyqx&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">BUPTyqx&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">GoogleNet V1-V4模型笔记</h1>
+            
+                <div class="post-meta">
+                    
+                        🦹‍♀️作者: <a itemprop="author" rel="author" href="/">尹祺翔</a><br>
+                    
+
+                    
+                        <span class="post-time">
+                        ⏲️时间: <a href="#">July 3, 2022&nbsp;&nbsp;11:32:44</a><br>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                            📒目录:
+                            
+                                <a href="/categories/CVBaseline/">CVBaseline</a><br>
+                            
+                        </span>
+                    
+                    
+                    
+                        <span class="post-count">
+                            📑字数:
+                        <a href="">6,517</a><br>  
+                        </span>
+                    
+                    
+                        <span class="post-count">
+                    ⏰预计阅读时间:
+                        <a href="">30min</a>  
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="CVbaseline-GoogleNet系列模型笔记"><a href="#CVbaseline-GoogleNet系列模型笔记" class="headerlink" title="CVbaseline-GoogleNet系列模型笔记"></a>CVbaseline-GoogleNet系列模型笔记</h1><h2 id="1-相关研究"><a href="#1-相关研究" class="headerlink" title="1.相关研究"></a>1.相关研究</h2><p>1.NIN(Network in Network)：首个采用$1\times 1$卷积的卷积神经网络，舍弃全连接层，大大减少网络参数。</p>
+<p>特点：</p>
+<ul>
+<li>$1\times 1$卷积</li>
+<li>GAP输出（Global Average Pooling全局平均池化）</li>
+</ul>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220703113521966.png" alt="image-20220703113521966"></p>
+<p>2.Robust Object Recognition with Cortex-Like Mechanisms ：<strong>多尺度</strong>Gabor滤波器提取特征</p>
+<p>特点：S1层采用8种尺度Gabor滤波器进行提取不同尺度特征</p>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220703113605577.png" alt="image-20220703113605577"></p>
+<p>3.Hebbian principle（赫布理论）：</p>
+<blockquote>
+<p>“Cells that fire together, wire together”</p>
+<p>(一起激发的神经元连接在一起)</p>
+</blockquote>
+<h2 id="2-研究成果"><a href="#2-研究成果" class="headerlink" title="2.研究成果"></a>2.研究成果</h2><div class="table-container">
+<table>
+<thead>
+<tr>
+<th><strong>模型</strong></th>
+<th><strong>时间</strong></th>
+<th><strong>top-5</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AlexNet</td>
+<td>2012</td>
+<td>15.3%</td>
+</tr>
+<tr>
+<td>ZFNet</td>
+<td>2013</td>
+<td>13.5%</td>
+</tr>
+<tr>
+<td>VGG</td>
+<td>2014</td>
+<td>7.3%</td>
+</tr>
+<tr>
+<td>GoogLeNet</td>
+<td>2014</td>
+<td>6.6%</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>ILSVRC</strong>成绩：</p>
+<ul>
+<li>GoogLeNet：分类第一名，检测第一名，定位第二名</li>
+<li>VGG：定位第一名，分类第二名</li>
+</ul>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220703113650317.png" alt="image-20220703113650317"></p>
+<p><strong>研究意义</strong>：</p>
+<ul>
+<li>开启多尺度卷积时代</li>
+<li>拉开$1\times 1$卷积广泛应用序幕</li>
+<li>为GoogLeNet系列开辟道路</li>
+</ul>
+<h2 id="3-摘要"><a href="#3-摘要" class="headerlink" title="3.摘要"></a>3.摘要</h2><ul>
+<li>本文主题：提出名为Inception的深度卷积神经网络，在ILSVRC-2014获得分类及检测双料冠军</li>
+<li>模型特点1：Inception特点是提高计算资源利用率，增加网络深度和宽度时，参数少量增加</li>
+<li>模型特点2：借鉴Hebbain理论和多尺度处理</li>
+</ul>
+<h2 id="4-GoogleNet结构"><a href="#4-GoogleNet结构" class="headerlink" title="4.GoogleNet结构"></a>4.GoogleNet结构</h2><h3 id="4-1-Inception-module"><a href="#4-1-Inception-module" class="headerlink" title="4.1 Inception module"></a>4.1 Inception module</h3><p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220703114952201.png" alt="image-20220703114952201"></p>
+<p>特点：</p>
+<ul>
+<li>多尺度（采用不同尺度的卷积核提取特征，多个分支进行处理）</li>
+<li>$1\times1$卷积降维，信息融合</li>
+<li>$3\times3$max pooling保留了特征图数量</li>
+</ul>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220703114619751.png" alt="image-20220703114619751"></p>
+<p>$3\times 3$ pool 可让特征图通道数增加，且用较少计算量</p>
+<ul>
+<li>缺点：数据量（特征图）激增，计算量很大</li>
+<li>解决方法：引入$1\times 1$卷积压缩<strong>厚度</strong>（试图减少卷积层输入的通道数量）。</li>
+</ul>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220703114648018.png" alt="image-20220703114648018"></p>
+<p>Inception代码：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Inception</span>(nn.Module):</span><br><span class="line">    __constants__ = [<span class="string">'branch2'</span>, <span class="string">'branch3'</span>, <span class="string">'branch4'</span>]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, in_channels, ch1x1, ch3x3red, ch3x3, ch5x5red, ch5x5, pool_proj,</span></span><br><span class="line"><span class="params">                 conv_block=<span class="literal">None</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(Inception, self).__init__()</span><br><span class="line">        <span class="keyword">if</span> conv_block <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            conv_block = BasicConv2d</span><br><span class="line">        <span class="comment"># 定义四个分支</span></span><br><span class="line">        <span class="comment"># 1*1</span></span><br><span class="line">        self.branch1 = conv_block(in_channels, ch1x1, kernel_size=<span class="number">1</span>)    <span class="comment"># 1*1</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 3*3</span></span><br><span class="line">        self.branch2 = nn.Sequential(</span><br><span class="line">            conv_block(in_channels, ch3x3red, kernel_size=<span class="number">1</span>),</span><br><span class="line">            conv_block(ch3x3red, ch3x3, kernel_size=<span class="number">3</span>, padding=<span class="number">1</span>)</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 5*5 ；  kernel size 是 3*3</span></span><br><span class="line">        self.branch3 = nn.Sequential(</span><br><span class="line">            conv_block(in_channels, ch5x5red, kernel_size=<span class="number">1</span>),</span><br><span class="line">            conv_block(ch5x5red, ch5x5, kernel_size=<span class="number">3</span>, padding=<span class="number">1</span>)</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        <span class="comment"># pool</span></span><br><span class="line">        self.branch4 = nn.Sequential(</span><br><span class="line">            nn.MaxPool2d(kernel_size=<span class="number">3</span>, stride=<span class="number">1</span>, padding=<span class="number">1</span>, ceil_mode=<span class="literal">True</span>),</span><br><span class="line">            conv_block(in_channels, pool_proj, kernel_size=<span class="number">1</span>)</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        branch1 = self.branch1(x)</span><br><span class="line">        branch2 = self.branch2(x)</span><br><span class="line">        branch3 = self.branch3(x)</span><br><span class="line">        branch4 = self.branch4(x)</span><br><span class="line"></span><br><span class="line">        outputs = [branch1, branch2, branch3, branch4]</span><br><span class="line">        <span class="keyword">return</span> outputs</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        outputs = self._forward(x)</span><br><span class="line">        <span class="comment"># torch.cat(outputs, 1)在第一个维度，channel维度进行拼接</span></span><br><span class="line">        <span class="keyword">return</span> torch.cat(outputs, <span class="number">1</span>)</span><br></pre></td></tr></tbody></table></figure>
+<p>基本卷积层定义：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">BasicConv2d</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, in_channels, out_channels, **kwargs</span>):</span><br><span class="line">        <span class="built_in">super</span>(BasicConv2d, self).__init__()</span><br><span class="line">        <span class="comment"># nn.Conv2d的卷积</span></span><br><span class="line">        self.conv = nn.Conv2d(in_channels, out_channels, bias=<span class="literal">False</span>, **kwargs)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        x = self.conv(x)</span><br><span class="line">        <span class="keyword">return</span> F.relu(x, inplace=<span class="literal">True</span>)</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="4-2-GoogLeNet"><a href="#4-2-GoogLeNet" class="headerlink" title="4.2 GoogLeNet"></a>4.2 GoogLeNet</h3><blockquote>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/绘图96.png" alt="绘图96"></p>
+<ul>
+<li>蓝色：卷积</li>
+<li>红色：池化</li>
+<li>绿色：LRN/特征融合</li>
+<li>黄色：激活函数</li>
+</ul>
+</blockquote>
+<p>三阶段：</p>
+<ul>
+<li>conv-pool-conv-pool 快速降低分辨率</li>
+<li>堆叠Inception：堆叠使用Inception Module，达22层</li>
+<li>FC层分类输出</li>
+</ul>
+<p>附：增加两个辅助损失（图中下部的两个特殊分支），<strong>缓解梯度消失</strong>（中间层特征具有分类能力）</p>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220703114816712.png" alt="image-20220703114816712"></p>
+<blockquote>
+<p>上面的结构特点：5个Block，5次分辨率下降，卷积核数量变化魔幻，输出层为1层FC层。</p>
+</blockquote>
+<p>网络代码：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> namedtuple</span><br><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line"><span class="keyword">import</span> torch.nn.functional <span class="keyword">as</span> F</span><br><span class="line"><span class="keyword">from</span> torch.jit.annotations <span class="keyword">import</span> <span class="type">Optional</span>, <span class="type">Tuple</span></span><br><span class="line"><span class="keyword">from</span> torch <span class="keyword">import</span> Tensor</span><br><span class="line"></span><br><span class="line">GoogLeNetOutputs = namedtuple(<span class="string">'GoogLeNetOutputs'</span>, [<span class="string">'logits'</span>, <span class="string">'aux_logits2'</span>, <span class="string">'aux_logits1'</span>])</span><br><span class="line">GoogLeNetOutputs.__annotations__ = {<span class="string">'logits'</span>: Tensor, <span class="string">'aux_logits2'</span>: <span class="type">Optional</span>[Tensor],</span><br><span class="line">                                    <span class="string">'aux_logits1'</span>: <span class="type">Optional</span>[Tensor]}</span><br><span class="line">_GoogLeNetOutputs = GoogLeNetOutputs</span><br><span class="line"></span><br><span class="line"><span class="comment"># 类定义</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">GoogLeNet</span>(nn.Module):</span><br><span class="line">    __constants__ = [<span class="string">'aux_logits'</span>, <span class="string">'transform_input'</span>]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, num_classes=<span class="number">1000</span>, aux_logits=<span class="literal">True</span>, transform_input=<span class="literal">False</span>, init_weights=<span class="literal">True</span>,</span></span><br><span class="line"><span class="params">                 blocks=<span class="literal">None</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(GoogLeNet, self).__init__()</span><br><span class="line">        <span class="keyword">if</span> blocks <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="comment"># 三个核心组件：卷积+Inception+Inception辅助损失</span></span><br><span class="line">            blocks = [BasicConv2d, Inception, InceptionAux]   </span><br><span class="line">            <span class="comment"># 定义基本组件</span></span><br><span class="line">        <span class="keyword">assert</span> <span class="built_in">len</span>(blocks) == <span class="number">3</span></span><br><span class="line">        </span><br><span class="line">        conv_block = blocks[<span class="number">0</span>]</span><br><span class="line">        inception_block = blocks[<span class="number">1</span>]</span><br><span class="line">        inception_aux_block = blocks[<span class="number">2</span>]</span><br><span class="line"></span><br><span class="line">        self.aux_logits = aux_logits</span><br><span class="line">        self.transform_input = transform_input</span><br><span class="line">		<span class="comment"># 第一阶段</span></span><br><span class="line">        self.conv1 = conv_block(<span class="number">3</span>, <span class="number">64</span>, kernel_size=<span class="number">7</span>, stride=<span class="number">2</span>, padding=<span class="number">3</span>)</span><br><span class="line">        self.maxpool1 = nn.MaxPool2d(<span class="number">3</span>, stride=<span class="number">2</span>, ceil_mode=<span class="literal">True</span>)</span><br><span class="line">        self.conv2 = conv_block(<span class="number">64</span>, <span class="number">64</span>, kernel_size=<span class="number">1</span>)</span><br><span class="line">        self.conv3 = conv_block(<span class="number">64</span>, <span class="number">192</span>, kernel_size=<span class="number">3</span>, padding=<span class="number">1</span>)</span><br><span class="line">        self.maxpool2 = nn.MaxPool2d(<span class="number">3</span>, stride=<span class="number">2</span>, ceil_mode=<span class="literal">True</span>)</span><br><span class="line">        <span class="comment"># 第二阶段</span></span><br><span class="line">        self.inception3a = inception_block(<span class="number">192</span>, <span class="number">64</span>, <span class="number">96</span>, <span class="number">128</span>, <span class="number">16</span>, <span class="number">32</span>, <span class="number">32</span>)</span><br><span class="line">        self.inception3b = inception_block(<span class="number">256</span>, <span class="number">128</span>, <span class="number">128</span>, <span class="number">192</span>, <span class="number">32</span>, <span class="number">96</span>, <span class="number">64</span>)</span><br><span class="line">        self.maxpool3 = nn.MaxPool2d(<span class="number">3</span>, stride=<span class="number">2</span>, ceil_mode=<span class="literal">True</span>)</span><br><span class="line">		<span class="comment"># 第三阶段</span></span><br><span class="line">        self.inception4a = inception_block(<span class="number">480</span>, <span class="number">192</span>, <span class="number">96</span>, <span class="number">208</span>, <span class="number">16</span>, <span class="number">48</span>, <span class="number">64</span>)</span><br><span class="line">        self.inception4b = inception_block(<span class="number">512</span>, <span class="number">160</span>, <span class="number">112</span>, <span class="number">224</span>, <span class="number">24</span>, <span class="number">64</span>, <span class="number">64</span>)</span><br><span class="line">        self.inception4c = inception_block(<span class="number">512</span>, <span class="number">128</span>, <span class="number">128</span>, <span class="number">256</span>, <span class="number">24</span>, <span class="number">64</span>, <span class="number">64</span>)</span><br><span class="line">        self.inception4d = inception_block(<span class="number">512</span>, <span class="number">112</span>, <span class="number">144</span>, <span class="number">288</span>, <span class="number">32</span>, <span class="number">64</span>, <span class="number">64</span>)</span><br><span class="line">        self.inception4e = inception_block(<span class="number">528</span>, <span class="number">256</span>, <span class="number">160</span>, <span class="number">320</span>, <span class="number">32</span>, <span class="number">128</span>, <span class="number">128</span>)</span><br><span class="line">        self.maxpool4 = nn.MaxPool2d(<span class="number">2</span>, stride=<span class="number">2</span>, ceil_mode=<span class="literal">True</span>)</span><br><span class="line">		<span class="comment"># 第四阶段</span></span><br><span class="line">        self.inception5a = inception_block(<span class="number">832</span>, <span class="number">256</span>, <span class="number">160</span>, <span class="number">320</span>, <span class="number">32</span>, <span class="number">128</span>, <span class="number">128</span>)</span><br><span class="line">        self.inception5b = inception_block(<span class="number">832</span>, <span class="number">384</span>, <span class="number">192</span>, <span class="number">384</span>, <span class="number">48</span>, <span class="number">128</span>, <span class="number">128</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> aux_logits:</span><br><span class="line">            self.aux1 = inception_aux_block(<span class="number">512</span>, num_classes)</span><br><span class="line">            self.aux2 = inception_aux_block(<span class="number">528</span>, num_classes)</span><br><span class="line">		<span class="comment"># 第五阶段</span></span><br><span class="line">        self.avgpool = nn.AdaptiveAvgPool2d((<span class="number">1</span>, <span class="number">1</span>))</span><br><span class="line">        self.dropout = nn.Dropout(<span class="number">0.2</span>)                     <span class="comment"># 0.4 变为 0.2</span></span><br><span class="line">        self.fc = nn.Linear(<span class="number">1024</span>, num_classes)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> init_weights:</span><br><span class="line">            self._initialize_weights()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_initialize_weights</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">for</span> m <span class="keyword">in</span> self.modules():</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">isinstance</span>(m, nn.Conv2d) <span class="keyword">or</span> <span class="built_in">isinstance</span>(m, nn.Linear):</span><br><span class="line">                <span class="keyword">import</span> scipy.stats <span class="keyword">as</span> stats</span><br><span class="line">                X = stats.truncnorm(-<span class="number">2</span>, <span class="number">2</span>, scale=<span class="number">0.01</span>)</span><br><span class="line">                values = torch.as_tensor(X.rvs(m.weight.numel()), dtype=m.weight.dtype)</span><br><span class="line">                values = values.view(m.weight.size())</span><br><span class="line">                <span class="keyword">with</span> torch.no_grad():</span><br><span class="line">                    m.weight.copy_(values)</span><br><span class="line">            <span class="keyword">elif</span> <span class="built_in">isinstance</span>(m, nn.BatchNorm2d):</span><br><span class="line">                nn.init.constant_(m.weight, <span class="number">1</span>)</span><br><span class="line">                nn.init.constant_(m.bias, <span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_transform_input</span>(<span class="params">self, x</span>):</span><br><span class="line">        <span class="comment"># type: (Tensor) -&gt; Tensor</span></span><br><span class="line">        <span class="keyword">if</span> self.transform_input:</span><br><span class="line">            x_ch0 = torch.unsqueeze(x[:, <span class="number">0</span>], <span class="number">1</span>) * (<span class="number">0.229</span> / <span class="number">0.5</span>) + (<span class="number">0.485</span> - <span class="number">0.5</span>) / <span class="number">0.5</span></span><br><span class="line">            x_ch1 = torch.unsqueeze(x[:, <span class="number">1</span>], <span class="number">1</span>) * (<span class="number">0.224</span> / <span class="number">0.5</span>) + (<span class="number">0.456</span> - <span class="number">0.5</span>) / <span class="number">0.5</span></span><br><span class="line">            x_ch2 = torch.unsqueeze(x[:, <span class="number">2</span>], <span class="number">1</span>) * (<span class="number">0.225</span> / <span class="number">0.5</span>) + (<span class="number">0.406</span> - <span class="number">0.5</span>) / <span class="number">0.5</span></span><br><span class="line">            x = torch.cat((x_ch0, x_ch1, x_ch2), <span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        <span class="comment"># type: (Tensor) -&gt; <span class="type">Tuple</span>[Tensor, <span class="type">Optional</span>[Tensor], <span class="type">Optional</span>[Tensor]]</span></span><br><span class="line">        <span class="comment"># N x 3 x 224 x 224</span></span><br><span class="line">        x = self.conv1(x)</span><br><span class="line">        <span class="comment"># N x 64 x 112 x 112</span></span><br><span class="line">        x = self.maxpool1(x)</span><br><span class="line">        <span class="comment"># N x 64 x 56 x 56</span></span><br><span class="line">        x = self.conv2(x)</span><br><span class="line">        <span class="comment"># N x 64 x 56 x 56</span></span><br><span class="line">        x = self.conv3(x)</span><br><span class="line">        <span class="comment"># N x 192 x 56 x 56</span></span><br><span class="line">        x = self.maxpool2(x)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># N x 192 x 28 x 28</span></span><br><span class="line">        x = self.inception3a(x)</span><br><span class="line">        <span class="comment"># N x 256 x 28 x 28</span></span><br><span class="line">        x = self.inception3b(x)</span><br><span class="line">        <span class="comment"># N x 480 x 28 x 28</span></span><br><span class="line">        x = self.maxpool3(x)</span><br><span class="line">        <span class="comment"># N x 480 x 14 x 14</span></span><br><span class="line">        x = self.inception4a(x)</span><br><span class="line">        <span class="comment"># N x 512 x 14 x 14</span></span><br><span class="line">        <span class="comment"># 只有在训练阶段才进行辅助损失</span></span><br><span class="line">        aux_defined = self.training <span class="keyword">and</span> self.aux_logits</span><br><span class="line">        <span class="comment"># 定义辅助损失</span></span><br><span class="line">        <span class="keyword">if</span> aux_defined:</span><br><span class="line">            aux1 = self.aux1(x)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            aux1 = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">        x = self.inception4b(x)</span><br><span class="line">        <span class="comment"># N x 512 x 14 x 14</span></span><br><span class="line">        x = self.inception4c(x)</span><br><span class="line">        <span class="comment"># N x 512 x 14 x 14</span></span><br><span class="line">        x = self.inception4d(x)</span><br><span class="line">        <span class="comment"># N x 528 x 14 x 14</span></span><br><span class="line">        <span class="comment"># 是否进行辅助损失</span></span><br><span class="line">        <span class="keyword">if</span> aux_defined:</span><br><span class="line">            aux2 = self.aux2(x)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            aux2 = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">        x = self.inception4e(x)</span><br><span class="line">        <span class="comment"># N x 832 x 14 x 14</span></span><br><span class="line">        x = self.maxpool4(x)</span><br><span class="line">        <span class="comment"># N x 832 x 7 x 7</span></span><br><span class="line">        x = self.inception5a(x)</span><br><span class="line">        <span class="comment"># N x 832 x 7 x 7</span></span><br><span class="line">        x = self.inception5b(x)</span><br><span class="line">        <span class="comment"># N x 1024 x 7 x 7</span></span><br><span class="line"></span><br><span class="line">        x = self.avgpool(x)</span><br><span class="line">        <span class="comment"># N x 1024 x 1 x 1</span></span><br><span class="line">        x = torch.flatten(x, <span class="number">1</span>)</span><br><span class="line">        <span class="comment"># N x 1024</span></span><br><span class="line">        x = self.dropout(x)</span><br><span class="line">        x = self.fc(x)</span><br><span class="line">        <span class="comment"># N x 1000 (num_classes)</span></span><br><span class="line">        <span class="keyword">return</span> x, aux2, aux1</span><br><span class="line"></span><br><span class="line"><span class="meta">    @torch.jit.unused</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">eager_outputs</span>(<span class="params">self, x, aux2, aux1</span>):</span><br><span class="line">        <span class="comment"># type: (Tensor, <span class="type">Optional</span>[Tensor], <span class="type">Optional</span>[Tensor]) -&gt; GoogLeNetOutputs</span></span><br><span class="line">        <span class="keyword">if</span> self.training <span class="keyword">and</span> self.aux_logits:</span><br><span class="line">            <span class="keyword">return</span> _GoogLeNetOutputs(x, aux2, aux1)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        <span class="comment"># type: (Tensor) -&gt; GoogLeNetOutputs</span></span><br><span class="line">        x = self._transform_input(x)        <span class="comment"># 里面会判断是否需要transform</span></span><br><span class="line">        x, aux1, aux2 = self._forward(x)    <span class="comment"># 正式forwaord</span></span><br><span class="line">        aux_defined = self.training <span class="keyword">and</span> self.aux_logits</span><br><span class="line">        <span class="keyword">if</span> torch.jit.is_scripting():</span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> aux_defined:</span><br><span class="line">                warnings.warn(<span class="string">"Scripted GoogleNet always returns GoogleNetOutputs Tuple"</span>)</span><br><span class="line">            <span class="keyword">return</span> GoogLeNetOutputs(x, aux2, aux1)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> self.eager_outputs(x, aux2, aux1)</span><br></pre></td></tr></tbody></table></figure>
+<h2 id="5-训练技巧"><a href="#5-训练技巧" class="headerlink" title="5.训练技巧"></a>5.训练技巧</h2><p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220704014209401.png" alt="image-20220704014209401"></p>
+<p>1.<strong>辅助损失</strong>：在Inception4b和Inception4e增加两个辅助分类层，用于计算辅助损失，达到：</p>
+<ul>
+<li><p>增加<strong>loss回传</strong></p>
+</li>
+<li><p>充当<strong>正则约束</strong>，迫使中间层特征也能具备分类能力</p>
+</li>
+</ul>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220703121824604.png" alt="image-20220703121824604"></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 辅助损失定义 4a 4d</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">InceptionAux</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, in_channels, num_classes, conv_block=<span class="literal">None</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(InceptionAux, self).__init__()</span><br><span class="line">        <span class="keyword">if</span> conv_block <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            conv_block = BasicConv2d</span><br><span class="line">        self.conv = conv_block(in_channels, <span class="number">128</span>, kernel_size=<span class="number">1</span>)</span><br><span class="line">        self.fc1 = nn.Linear(<span class="number">2048</span>, <span class="number">1024</span>)</span><br><span class="line">        self.fc2 = nn.Linear(<span class="number">1024</span>, num_classes)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        <span class="comment"># aux1: N x 512 x 14 x 14, aux2: N x 528 x 14 x 14</span></span><br><span class="line">        x = F.adaptive_avg_pool2d(x, (<span class="number">4</span>, <span class="number">4</span>)) <span class="comment"># 池化</span></span><br><span class="line">        <span class="comment"># aux1: N x 512 x 4 x 4, aux2: N x 528 x 4 x 4</span></span><br><span class="line">        x = self.conv(x)</span><br><span class="line">        <span class="comment"># N x 128 x 4 x 4</span></span><br><span class="line">        x = torch.flatten(x, <span class="number">1</span>)</span><br><span class="line">        <span class="comment"># N x 2048</span></span><br><span class="line">        x = F.relu(self.fc1(x), inplace=<span class="literal">True</span>)</span><br><span class="line">        <span class="comment"># N x 1024</span></span><br><span class="line">        x = F.dropout(x, <span class="number">0.7</span>, training=self.training)</span><br><span class="line">        <span class="comment"># N x 1024</span></span><br><span class="line">        x = self.fc2(x)</span><br><span class="line">        <span class="comment"># N x 1000 (num_classes)</span></span><br><span class="line">        <span class="keyword">return</span> x</span><br></pre></td></tr></tbody></table></figure>
+<p>2.<strong>学习率下降策略</strong>：每8个epoch下降4%：fixed learning rate schedule (decreasing the learning rate by 4% every 8 epochs）$0.96^{100 }= 0.016$， 800个epochs，才下降不到100倍。</p>
+<p>3.<strong>数据增强</strong>：指导方针如下：</p>
+<ul>
+<li>图像尺寸均匀分布在8%-100%​之间，进行随机裁剪。</li>
+<li>长宽比在$[3/4,  4/3]$之间</li>
+<li>光度畸变可以减轻过拟合，Photometric distortions 有效，如亮度、饱和度和对比度等</li>
+</ul>
+<h2 id="6-测试技巧"><a href="#6-测试技巧" class="headerlink" title="6.测试技巧"></a>6.测试技巧</h2><p><strong>1.</strong> <strong>Multi crop</strong>：1张图变144张图</p>
+<blockquote>
+<ul>
+<li>Step1: 等比例缩放短边至256, 288, 320, 352，四种尺寸。 <strong>一分为四</strong></li>
+<li>Step2:  在长边上裁剪出3个正方形，左中右或者上中下，三个位置。 <strong>一分为三</strong></li>
+<li>Step3: 左上，右上，左下，右下，中心，全局resize，六个位置。<strong>一分为六</strong></li>
+<li>Step4: 水平镜像。<strong>一分为二</strong></li>
+</ul>
+</blockquote>
+<p>$4\times 3\times 6\times 2 = 144$</p>
+<p><strong>2.</strong> <strong>Model Fusion</strong></p>
+<p>七个模型训练差异仅在图像采样方式和顺序的差异</p>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220703150055607.png" alt="image-20220703150055607"></p>
+<h2 id="7-模型结果"><a href="#7-模型结果" class="headerlink" title="7.模型结果"></a>7.模型结果</h2><p><strong>分类结果：</strong></p>
+<ul>
+<li>模型融合： 多模型比单模型精度高。</li>
+<li>Multi Cros：crop越多，精度越高</li>
+</ul>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220703151519045.png" alt="image-20220703151519045"></p>
+<p><strong>检测结果：</strong></p>
+<p>模型融合： 多模型比单模型精度高</p>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220703151526007.png" alt="image-20220703151526007"></p>
+<h2 id="8-稀疏结构"><a href="#8-稀疏结构" class="headerlink" title="8.稀疏结构"></a>8.稀疏结构</h2><p><strong>稀疏矩阵：</strong>数值为0的元素数目远远多于非0元素的数目， 且无规律</p>
+<p><strong>稠密矩阵：</strong>数值非0的元素数目远远多于为0元素的数目， 且无规律</p>
+<p>稀疏矩阵优点是，可<strong>分解</strong>成密集矩阵计算来加快收敛速度。稀疏矩阵中0较多的区域就可以不用计算，计算量就大大降低。</p>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220703152402337.png" alt="image-20220703152402337"></p>
+<p><strong>特征图通道的分解</strong></p>
+<p>672个特征图分解为四个部分</p>
+<ul>
+<li>$1\times1$卷积核提取的 128个通道</li>
+<li>$3\times 3$ 卷积核提取的192个通道</li>
+<li>$5\times 5$卷积核提取的96个通道</li>
+<li>$3\times3$池化提取的256个通道</li>
+</ul>
+<p>打破<strong>均匀分布</strong>，相关性强的<strong>特征聚集</strong>在一起</p>
+<blockquote>
+<p>【思考】Inception的设计思路：</p>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220703114648018.png" alt="image-20220703114648018"></p>
+<ul>
+<li>在直观感觉上在多个尺度上同时进行卷积，能提取到不同尺度的特征。特征更为丰富也意味着最后分类判断时更加准确。</li>
+<li>利用稀疏矩阵分解成密集矩阵计算的原理来加快收敛速度。在inception上就是要在特征维度上进行分解。inception模块在多个尺度上提取特征，输出的256个特征就不再是均匀分布，而是相关性强的特征聚集在一起（比如$1\times1$的的96个特征聚集在一起，$3\times3$的96个特征聚集在一起，$5\times5$的64个特征聚集在一起）。这样的特征集中因为相关性较强的特征聚集在了一起，不相关的非关键特征就被弱化，同样是输出256个特征，inception方法输出的冗余信息较少。</li>
+<li>Hebbin赫布原理。赫布认为“两个神经元或者神经元系统，如果总是同时兴奋，就会形成一种‘组合’，其中一个神经元的兴奋会促进另一个的兴奋”。在inception结构中就是要把相关性强的特征汇聚到一起，把$1\times1，3\times3，5\times5$的特征分开。因为训练收敛的最终目的就是要提取出独立的特征，所以预先把相关性强的特征汇聚，就能起到加速收敛的作用。</li>
+</ul>
+</blockquote>
+<h2 id="9-总结"><a href="#9-总结" class="headerlink" title="9.总结"></a>9.总结</h2><p><strong>关键点&amp;创新点</strong></p>
+<ul>
+<li>大量使用$1\times1$，可降低维度，减少计算量，参数是AlexNet的是十二分之一</li>
+<li>多尺度卷积核，实现多尺度特征提取</li>
+<li>辅助损失层，增加梯度回传，增加正则，减轻过拟合</li>
+</ul>
+<blockquote>
+<p>总结：</p>
+<ul>
+<li>池化损失空间分辨率，但在定位、检测和人体姿态识别中仍应用。延伸拓展：定位、检测和人体姿态识别这些任务十分注重空间分辨率信息。</li>
+<li>增加模型深度和宽度，可有效提升性能，但有2个缺点：容易过拟合，以及计算量过大</li>
+<li>为节省内存消耗，先将分辨率降低，再堆叠使用Inception module</li>
+<li>最后一个全连接层，是为了更方便的微调，迁移学习</li>
+<li>网络中间层特征对于分类也具有判别性</li>
+<li>学习率下降策略为每8个epochs下降4%（loss曲线很平滑）</li>
+<li>数据增强指导方针：1. 尺寸在8%-100%；2. 长宽比在$[3/4,  4/3]$; 3. 光照畸变有效</li>
+<li>随机采用差值方法可提升性能</li>
+<li>实际应用中没必要144 crops</li>
+</ul>
+</blockquote>
+<h2 id="10-改进1-V2-批标准化"><a href="#10-改进1-V2-批标准化" class="headerlink" title="10.改进1 V2 批标准化"></a>10.改进1 V2 批标准化</h2><p>在GoogLeNet-V1 基础上加入BN层，同时借鉴VGG的小卷积核思想，将$5\times 5$卷积替换为2个$3\times3$卷积，提出了GoogLeNet-V2。</p>
+<p><strong>研究成果：</strong></p>
+<ol>
+<li>提出BN层：加快模型收敛，比googlenet-v1快数十倍，获得更优结果</li>
+<li>GoogLeNet-v2 获得ILSVRC 分类任务 SOTA。BN使模型训练加快14倍，并且可显著提高分类精度，在Imagenet分类任务中超越了人类的表现。</li>
+<li>开启神经网络设计新时代，标准化层已经成为深度神经网络标配。在Batch Normalization基础上拓展出了一系例标准化网络层，如Layer Normalization（LN），Instance Normalization（IN），Group Normalization（GN）</li>
+</ol>
+<blockquote>
+<p><strong>相关研究：</strong></p>
+<ul>
+<li>ICS（Internal Covariate Shift，内部协变量偏移）现象：输入数据分布变化，导致的模型训练困难，对深度神经网络影响极大。</li>
+</ul>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/绘图1.png" alt="绘图1"></p>
+<ul>
+<li>白化（Whitening）：为了解决ICS，可以使用白化的方法，去除输入数据的冗余信息，使得数据特征之间的<strong>相关性较低</strong>，所有特征具有<strong>相同方差</strong>。依照概率论，$N(x)=(x-\text{mean}/\text{std})$，使得$x$变为0均值，1标准差。</li>
+</ul>
+</blockquote>
+<p><strong>BN 优点：</strong></p>
+<ol>
+<li>可以用更大学习率，加速模型收敛。针对类似Sigmoid的饱和激活函数，加上BN层后，可采用较大学习率。</li>
+<li>可以不用精心设计权值初始化</li>
+<li>可以不用dropout或较小的dropout。. 充当<strong>正则</strong>，顶替Dropout加入BN层后，将当前样本与以前样本通过统计信息联系起来，相当于某种约束，经实验表明可减轻Dropout的使用。</li>
+<li>可以不用L2或者较小的weight decay</li>
+<li>可以不用LRN(local response normalization)</li>
+</ol>
+<h3 id="10-1-BN层"><a href="#10-1-BN层" class="headerlink" title="10.1 BN层"></a>10.1 BN层</h3><blockquote>
+<p>批：一批数据，通常为mini-batch </p>
+<p>标准化：使得分布为 mean=0， std=1</p>
+</blockquote>
+<script type="math/tex; mode=display">
+\widehat{x}^{(k)}=\frac{x^{(k)}-\mathrm{E}\left[x^{(k)}\right]}{\sqrt{\operatorname{Var}\left[x^{(k)}\right]}}</script><ul>
+<li>存在的问题：使神经元输出值在sigmod的线性区，削弱了网络的表达能力。</li>
+<li>解决办法：$y^{(k)}=\gamma^{(k)}\widehat{x}^{(k)}+\beta^{(k)}$。采用<strong>可学习参数</strong>$\gamma$和$\beta$，增加线性变换，提升网络表达能力，同时提供<strong>恒等映射</strong>的可能（当$\gamma^{(k)}=\sqrt{\operatorname{Var}[x^{(k)}]}$和$\beta^{(k)}=\mathrm{E}[x^{(k)}]$时，BN层变为恒等映射，不改变神经元的输出值。$\widehat{x}^{(k)}=\frac{x^{(k)}-\mathrm{E}\left[x^{(k)}\right]}{\sqrt{\operatorname{Var}\left[x^{(k)}\right]}}$）</li>
+</ul>
+<p><strong>具体操作：</strong></p>
+<ul>
+<li>在mini-batch上计算均值</li>
+<li>在mini-batch上计算标准差</li>
+<li>减去均值，除以标准差，$\epsilon =1\times10^{-5}$，避免分母为0</li>
+<li>线性变换，$\gamma$和$\beta$实现缩放与平移。</li>
+</ul>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220703184346992.png" alt="image-20220703184346992"></p>
+<p>此时存在的问题：mini-batch的统计信息充当总体是不准确的</p>
+<p>解决办法：采用<strong>指数滑动平均（Exponential Moving Average）</strong>来估计整体的均值，具体操作如下，公式中，$a_t$为当前值，$\text{mv}_t$为指数滑动平均值，$\text{decay}$控制权重衰减的速度。</p>
+<script type="math/tex; mode=display">
+\begin{align}
+
+\text{mv}_t & = \text{decay}\times\text{mv}_{t-1}+(1-\text{decay})\times a_t\\
+\text{mv}_t & = \sum_{i  = 1}^t \text{decay}^{t-i}\times (1-\text{decay})\times a_t
+
+\end{align}</script><p>展开表示为：</p>
+<ul>
+<li><p>$\text{mv}_1=(1-\text{decay})a_1$</p>
+</li>
+<li><p>$\text{mv}_2=\text{decay}\times\text{mv}_1+ (1-\text{decay})a_2=\text{decay}(1-\text{decay})a_1+ (1-\text{decay})a_2$</p>
+</li>
+<li><p>$\text{mv}_3=\text{decay}^2(1-\text{decay})a_1+ \text{decay}(1-\text{decay})a_2+(1-\text{decay})a_3$</p>
+</li>
+<li><p>当$t-i&gt;C$，$C$为无穷大的时候，有：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+& \text{decay}^{t-i} \times(1-\text{decay})\times a_t\approx 0\\
+& \text{mv}_t  \approx\sum_{i  = t-C}^{t}\text{decay}^{t-i}\times(1-\text{decay})\times a_t
+\end{align}</script></li>
+</ul>
+<p>所以，算法的核心部分可以表示为：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\widehat{x}_{i} & \leftarrow \frac{x_{i}-\mu_{\mathcal{B}}}{\sqrt{\sigma_{\mathcal{B}}^{2}+\epsilon}} \\
+y_{i} & \leftarrow \widehat{x}_{i}+\beta \equiv \mathrm{BN}_{\gamma, \beta}\left(x_{i}\right)
+\end{aligned}</script><p>算法的整体流程如下：</p>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220703185154418.png" alt="image-20220703185154418"></p>
+<h3 id="10-2-GoogleNetV2网络结构"><a href="#10-2-GoogleNetV2网络结构" class="headerlink" title="10.2 GoogleNetV2网络结构"></a>10.2 GoogleNetV2网络结构</h3><p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220703191126773.png" alt="image-20220703191126773"></p>
+<blockquote>
+<p>对V1的改进： </p>
+<ol>
+<li>激活函数前加入BN</li>
+<li>$5\times5$卷积替换为2个$3\times3$卷积（小卷积核结构）</li>
+<li>第一个Inception模块增加一个Inception结构</li>
+<li>增多$5\times5$卷积核</li>
+<li>尺寸变化采用stride=2的卷积（不再使用池化操作）</li>
+<li>增加9层（10-1层）到 31层（10表示inception数量），使用了更多的卷积核</li>
+</ol>
+</blockquote>
+<p>加入BN的卷积层：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">BasicConv2d</span>(nn.Module):</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, in_channels, out_channels, **kwargs</span>):</span><br><span class="line">        <span class="built_in">super</span>(BasicConv2d, self).__init__()</span><br><span class="line">        self.conv = nn.Conv2d(in_channels, out_channels, bias=<span class="literal">False</span>, **kwargs)</span><br><span class="line">        self.bn = nn.BatchNorm2d(out_channels, eps=<span class="number">0.001</span>)  <span class="comment"># googlenet-v2</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        x = self.conv(x)</span><br><span class="line">        x = self.bn(x)  <span class="comment"># googlenet-v2</span></span><br><span class="line">        <span class="keyword">return</span> F.relu(x, inplace=<span class="literal">True</span>)</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="10-3-实验"><a href="#10-3-实验" class="headerlink" title="10.3 实验"></a>10.3 实验</h3><p>其使用的是tanh激活函数，从下图中可以发现：</p>
+<ul>
+<li>红色为未加入BN层的，在几个epoch后，其分布主要集中在两侧，说明已经落入了激活函数的饱和区间（在后面的几个epoch中，如&gt;6个epoch后，梯度很小，梯度不会更新了），而加入BN层后，可以拉至0均值附近，避免进入饱和区，其分布会相对均匀。</li>
+</ul>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/bn_tanh.gif" alt="bn_tanh"></p>
+<h3 id="10-4-nn-batchnorm"><a href="#10-4-nn-batchnorm" class="headerlink" title="10.4 nn.batchnorm"></a>10.4 nn.batchnorm</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">torch.nn.BatchNorm1d(num_features, </span><br><span class="line">                     eps=<span class="number">1e-05</span>, </span><br><span class="line">                     momentum=<span class="number">0.1</span>, </span><br><span class="line">                     affine=<span class="literal">True</span>, </span><br><span class="line">                     track_running_stats=<span class="literal">True</span>)</span><br></pre></td></tr></tbody></table></figure>
+<ul>
+<li>num_features – 一个样本的特征数量（最重要！！）</li>
+<li>eps – 为数值稳定性而加到分母上的值$\epsilon$。</li>
+<li>momentum – 移动平均的动量值。</li>
+<li>affine – 一个布尔值，当设置为真时，此模块具有可学习的仿射参数。</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">torch.nn.BatchNorm2d(num_features, eps=<span class="number">1e-05</span>, momentum=<span class="number">0.1</span>, </span><br><span class="line">                     affine=<span class="literal">True</span>, </span><br><span class="line">                     track_running_stats=<span class="literal">True</span>, </span><br><span class="line">                     device=<span class="literal">None</span>, dtype=<span class="literal">None</span>)</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">torch.nn.BatchNorm3d(num_features, eps=<span class="number">1e-05</span>, momentum=<span class="number">0.1</span>, </span><br><span class="line">                     affine=<span class="literal">True</span>, </span><br><span class="line">                     track_running_stats=<span class="literal">True</span>, </span><br><span class="line">                     device=<span class="literal">None</span>, dtype=<span class="literal">None</span>)</span><br></pre></td></tr></tbody></table></figure>
+<p>说明：此处的更新方式与论文中略有不同：</p>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220703214657092.png" alt="image-20220703214657092"></p>
+<h2 id="11-改进2-V3-改进Inception"><a href="#11-改进2-V3-改进Inception" class="headerlink" title="11.改进2 V3 改进Inception"></a>11.改进2 V3 改进Inception</h2><p>研究成果：</p>
+<p>1.提出Inception-V2 和 Inception-V3， Inception-V3模型获得 ILSVRC 分类任务<strong>SOTA</strong></p>
+<p>2.提出4个网络<strong>模型设计准则</strong>，为模型设计提供参考</p>
+<p>3.提出<strong>卷积分解、高效降低特征图分辨率</strong>方法和标签平滑技巧，提升网络速度与精度</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center"><strong>模型</strong></th>
+<th style="text-align:center"><strong>时间</strong></th>
+<th style="text-align:center"><strong>top-5</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">AlexNet</td>
+<td style="text-align:center">2012</td>
+<td style="text-align:center">15.3%</td>
+</tr>
+<tr>
+<td style="text-align:center">ZFNet</td>
+<td style="text-align:center">2013</td>
+<td style="text-align:center">13.5%</td>
+</tr>
+<tr>
+<td style="text-align:center">VGG</td>
+<td style="text-align:center">2014</td>
+<td style="text-align:center">7.3%</td>
+</tr>
+<tr>
+<td style="text-align:center">GoogLeNet</td>
+<td style="text-align:center">2014</td>
+<td style="text-align:center">6.6%</td>
+</tr>
+<tr>
+<td style="text-align:center">GoogLeNet v2</td>
+<td style="text-align:center">2015</td>
+<td style="text-align:center">4.9%</td>
+</tr>
+<tr>
+<td style="text-align:center">GoogLeNet v3</td>
+<td style="text-align:center">2015</td>
+<td style="text-align:center">3.5%</td>
+</tr>
+</tbody>
+</table>
+</div>
+<blockquote>
+<p>总结：网络设计准则：</p>
+<p>1.尽量避免<strong>信息瓶颈</strong>，通常发生在<strong>池化层</strong>，即特征图变小，信息量减少，类似一个瓶颈。</p>
+<p>2.采用更<strong>高维</strong>的表示方法能够更容易的处理网络的局部信息。</p>
+<p>3.大的卷积核可以分解为数个小卷积核，且不会降低网络能力。</p>
+<p>4.把握好深度和宽度的平衡。</p>
+</blockquote>
+<h3 id="11-1-卷积分解"><a href="#11-1-卷积分解" class="headerlink" title="11.1 卷积分解"></a>11.1 卷积分解</h3><ul>
+<li><p><strong>第一种分解</strong>：大卷积核分解为小卷积核堆叠，1个$5\times5$卷积分解为2个$3\times3$卷积，参数减少$1 -(9+9)/25 = 0.28%$（在VGG中有详细的介绍）</p>
+</li>
+<li><p><strong>第二种分解</strong>：分解为<strong>非对称卷积（Asymmetric Convolutionals）</strong>1个$n\times n$卷积分解为$1\times n$卷积 和$n\times 1$卷积堆叠。对于$3\times 3$而言，参数减少 $1 - (3+3)/9 = 0.33$。注意事项：非对称卷积在后半段使用效果才好，特别是特征图分辨率在$12\sim20$之间，本文在分辨率为$17\times17$的时候使用非对称卷积分解。</p>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/绘图1-1656857524427.png" alt="绘图1"></p>
+</li>
+</ul>
+<h3 id="11-2-辅助分类层的改进"><a href="#11-2-辅助分类层的改进" class="headerlink" title="11.2 辅助分类层的改进"></a>11.2 辅助分类层的改进</h3><p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220703121824604.png" alt="image-20220703121824604"></p>
+<p>GoogleNetV1中提出辅助分类层，用于缓解梯度消失，提升底层的特征提取能力，本文对辅助分类层进行分析，得出结论：</p>
+<ul>
+<li>辅助分类层在初期起不到作用，<strong>在后期才能提升网络性能</strong>，因此移除第一个辅助分类层不影响精度。</li>
+<li>辅助分类层可辅助低层提取特征是不正确的</li>
+<li>辅助分类层对模型起到正则的作用</li>
+<li>googlenet-v3只在$17\times17$特征图结束接入辅助分类层</li>
+</ul>
+<h3 id="11-3-高效特征图下降策略"><a href="#11-3-高效特征图下降策略" class="headerlink" title="11.3 高效特征图下降策略"></a>11.3 高效特征图下降策略</h3><ul>
+<li>特征图下降方式探讨：传统池化方法存在信息表征瓶颈（representational bottlenecks）问题（违反模型设计准则1），即<strong>特征图信息变少了</strong>。<ul>
+<li>简单解决方法：先用卷积将特征图通道数翻倍，再用池化。</li>
+<li>存在问题：计算量过大</li>
+<li>解决方法：用卷积得到一半的特征图，用池化得到另一半的特征图。</li>
+</ul>
+</li>
+</ul>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220704010816003.png" alt="image-20220704010816003"></p>
+<ul>
+<li><strong>高效特征图分辨率下降策略：</strong>用卷积得到一半特征图，用池化得到一半特征图。用较少的计算量获得较多的信息，避免信息表征瓶颈（ representational bottlenecks）<ul>
+<li>该Inception-module用于$35\times 35$下降至$17\times 17$，以及$17\times17$下降至$8\times8$。下图中右侧为左侧的简化：</li>
+</ul>
+</li>
+</ul>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220704010909470.png" alt="image-20220704010909470"></p>
+<h3 id="11-4-标签平滑"><a href="#11-4-标签平滑" class="headerlink" title="11.4 标签平滑"></a>11.4 标签平滑</h3><p>传统的ont-hot编码中存在的问题：导致过拟合</p>
+<p>提出了标签平滑，把one-hot中概率为1的那一项进行衰减，衰减的那部分自信度平均分到每一个类别中。</p>
+<p>举例：4分类任务，$\text{label}=(0,1,0,0)$</p>
+<p>标签平滑后：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\text{label Smoothing} & = (0.001/4,1-0.001+0.001/4,0.001/4,0.001/4)\\ & = (0.00025,0.99925,0.00025,0.00025)
+\end{align}</script><p><strong>标签平滑公式：</strong></p>
+<p>交叉熵（Cross Entropy）：$H(q,p)=-\sum_{k=1}^k\log(p_k)q_k$，其中$q$为one-hot向量。</p>
+<p>标签平滑：将$q$标签平滑为$q’$，让模型输出的$p$分布去逼近$q’$</p>
+<ul>
+<li>$q’(k|x)=(1-\varepsilon )\delta_{k,y}+\varepsilon u(k)$，其中$u(k)$为一个概率分布，这里如果采用均匀分布，则可以得到：$q’(k|x)=(1-\varepsilon )\delta_{k,y}+\frac{\varepsilon }{k}$</li>
+<li>所以标签平滑后的交叉熵损失函数为：</li>
+</ul>
+<p>推导：</p>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220704013211670.png" alt="image-20220704013211670"></p>
+<p>即：</p>
+<script type="math/tex; mode=display">
+H(q',p)=-\sum_{k=1}^k\log(p_k)q'_k=(1-\varepsilon )H(q,p)+\varepsilon H(q',p)</script><h3 id="11-5-模型结构"><a href="#11-5-模型结构" class="headerlink" title="11.5 模型结构"></a>11.5 模型结构</h3><p>针对V1的变化：</p>
+<ul>
+<li>采用3个$3\times3$卷积替换1个$7\times 7$卷积，并且在第一个卷积就采用stride=2来降低分辨率</li>
+<li>第二个$3\times3$卷积，在第2个卷积才下降分辨率</li>
+<li>第一个block增加一个inception-module，第一个inception-module只是将$5\times5$卷积替换为2个$3\times3$卷积。</li>
+<li>第二个block，处理$17\times17$特征图，采用非对称卷积。</li>
+<li>第三个block，处理$8\times8$特征图，遵循准则2，提出拓展的卷积</li>
+<li>最后输出2048个神经元（V1是1024个神经元）</li>
+</ul>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220704192619266.png" alt="image-20220704192619266"></p>
+<p>拓展的卷积结构如下（InceptionV2结构）：</p>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/image-20220704194000260.png" alt="image-20220704194000260" style="zoom:80%;"></p>
+<p>Inception V3对V2的改进：</p>
+<ul>
+<li>采用RMSProp优化方法</li>
+<li>采用Label Smoothing正则化方法</li>
+<li>采用非对称卷积提取$17\times17$特征图</li>
+<li>采用带BN的辅助分类层</li>
+</ul>
+<h3 id="11-6-各个Inception结构的代码"><a href="#11-6-各个Inception结构的代码" class="headerlink" title="11.6 各个Inception结构的代码"></a>11.6 各个Inception结构的代码</h3><p>核心部分代码：只保留了<code>init</code>和<code>forward</code>两个函数</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Inception3</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, num_classes=<span class="number">1000</span>, aux_logits=<span class="literal">True</span>, transform_input=<span class="literal">False</span>, init_weights=<span class="literal">False</span>,</span></span><br><span class="line"><span class="params">                 inception_blocks=<span class="literal">None</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(Inception3, self).__init__()</span><br><span class="line">        <span class="keyword">if</span> inception_blocks <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="comment"># inception核心组件！！！</span></span><br><span class="line">            inception_blocks = [</span><br><span class="line">                BasicConv2d, InceptionA, InceptionB, InceptionC,</span><br><span class="line">                InceptionD, InceptionE, InceptionAux</span><br><span class="line">            ]</span><br><span class="line">        <span class="keyword">assert</span> <span class="built_in">len</span>(inception_blocks) == <span class="number">7</span></span><br><span class="line">        conv_block = inception_blocks[<span class="number">0</span>]</span><br><span class="line">        inception_a = inception_blocks[<span class="number">1</span>]</span><br><span class="line">        inception_b = inception_blocks[<span class="number">2</span>]</span><br><span class="line">        inception_c = inception_blocks[<span class="number">3</span>]</span><br><span class="line">        inception_d = inception_blocks[<span class="number">4</span>]</span><br><span class="line">        inception_e = inception_blocks[<span class="number">5</span>]</span><br><span class="line">        inception_aux = inception_blocks[<span class="number">6</span>]</span><br><span class="line"></span><br><span class="line">        self.aux_logits = aux_logits</span><br><span class="line">        self.transform_input = transform_input</span><br><span class="line">        </span><br><span class="line">        self.Conv2d_1a_3x3 = conv_block(<span class="number">3</span>, <span class="number">32</span>, kernel_size=<span class="number">3</span>, stride=<span class="number">2</span>)</span><br><span class="line">        self.Conv2d_2a_3x3 = conv_block(<span class="number">32</span>, <span class="number">32</span>, kernel_size=<span class="number">3</span>)</span><br><span class="line">        self.Conv2d_2b_3x3 = conv_block(<span class="number">32</span>, <span class="number">64</span>, kernel_size=<span class="number">3</span>, padding=<span class="number">1</span>)</span><br><span class="line">        self.Conv2d_3b_1x1 = conv_block(<span class="number">64</span>, <span class="number">80</span>, kernel_size=<span class="number">1</span>)</span><br><span class="line">        self.Conv2d_4a_3x3 = conv_block(<span class="number">80</span>, <span class="number">192</span>, kernel_size=<span class="number">3</span>)</span><br><span class="line"></span><br><span class="line">        self.Mixed_5b = inception_a(<span class="number">192</span>, pool_features=<span class="number">32</span>)</span><br><span class="line">        self.Mixed_5c = inception_a(<span class="number">256</span>, pool_features=<span class="number">64</span>)</span><br><span class="line">        self.Mixed_5d = inception_a(<span class="number">288</span>, pool_features=<span class="number">64</span>)</span><br><span class="line"></span><br><span class="line">        self.Mixed_6a = inception_b(<span class="number">288</span>)</span><br><span class="line">        self.Mixed_6b = inception_c(<span class="number">768</span>, channels_7x7=<span class="number">128</span>)</span><br><span class="line">        self.Mixed_6c = inception_c(<span class="number">768</span>, channels_7x7=<span class="number">160</span>)</span><br><span class="line">        self.Mixed_6d = inception_c(<span class="number">768</span>, channels_7x7=<span class="number">160</span>)</span><br><span class="line">        self.Mixed_6e = inception_c(<span class="number">768</span>, channels_7x7=<span class="number">192</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> aux_logits:</span><br><span class="line">            self.AuxLogits = inception_aux(<span class="number">768</span>, num_classes)</span><br><span class="line"></span><br><span class="line">        self.Mixed_7a = inception_d(<span class="number">768</span>)</span><br><span class="line">        self.Mixed_7b = inception_e(<span class="number">1280</span>)</span><br><span class="line">        self.Mixed_7c = inception_e(<span class="number">2048</span>)</span><br><span class="line">        </span><br><span class="line">        self.fc = nn.Linear(<span class="number">2048</span>, num_classes)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> init_weights:</span><br><span class="line">            self._initialize_weights()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_forward</span>(<span class="params">self, x</span>):</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 1/5</span></span><br><span class="line">        <span class="comment"># N x 3 x 299 x 299</span></span><br><span class="line">        x = self.Conv2d_1a_3x3(x)</span><br><span class="line">        <span class="comment"># N x 32 x 149 x 149</span></span><br><span class="line">        x = self.Conv2d_2a_3x3(x)</span><br><span class="line">        <span class="comment"># N x 32 x 147 x 147</span></span><br><span class="line">        x = self.Conv2d_2b_3x3(x)</span><br><span class="line">        <span class="comment"># N x 64 x 147 x 147</span></span><br><span class="line">        x = F.max_pool2d(x, kernel_size=<span class="number">3</span>, stride=<span class="number">2</span>)</span><br><span class="line">        <span class="comment"># N x 64 x 73 x 73</span></span><br><span class="line">        x = self.Conv2d_3b_1x1(x)</span><br><span class="line">        <span class="comment"># N x 80 x 73 x 73</span></span><br><span class="line">        x = self.Conv2d_4a_3x3(x)</span><br><span class="line">        <span class="comment"># N x 192 x 71 x 71</span></span><br><span class="line">        x = F.max_pool2d(x, kernel_size=<span class="number">3</span>, stride=<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 2/5</span></span><br><span class="line">        <span class="comment"># N x 192 x 35 x 35</span></span><br><span class="line">        x = self.Mixed_5b(x)</span><br><span class="line">        <span class="comment"># N x 256 x 35 x 35</span></span><br><span class="line">        x = self.Mixed_5c(x)</span><br><span class="line">        <span class="comment"># N x 288 x 35 x 35</span></span><br><span class="line">        x = self.Mixed_5d(x)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 3/5</span></span><br><span class="line">        <span class="comment"># N x 288 x 35 x 35</span></span><br><span class="line">        x = self.Mixed_6a(x)</span><br><span class="line">        <span class="comment"># N x 768 x 17 x 17</span></span><br><span class="line">        x = self.Mixed_6b(x)</span><br><span class="line">        <span class="comment"># N x 768 x 17 x 17</span></span><br><span class="line">        x = self.Mixed_6c(x)</span><br><span class="line">        <span class="comment"># N x 768 x 17 x 17</span></span><br><span class="line">        x = self.Mixed_6d(x)</span><br><span class="line">        <span class="comment"># N x 768 x 17 x 17</span></span><br><span class="line">        x = self.Mixed_6e(x)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="comment"># N x 768 x 17 x 17</span></span><br><span class="line">        aux_defined = self.training <span class="keyword">and</span> self.aux_logits</span><br><span class="line">        <span class="keyword">if</span> aux_defined:</span><br><span class="line">            aux = self.AuxLogits(x)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            aux = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 4/5</span></span><br><span class="line">        <span class="comment"># N x 768 x 17 x 17</span></span><br><span class="line">        x = self.Mixed_7a(x)</span><br><span class="line">        <span class="comment"># N x 1280 x 8 x 8</span></span><br><span class="line">        x = self.Mixed_7b(x)</span><br><span class="line">        <span class="comment"># N x 2048 x 8 x 8</span></span><br><span class="line">        x = self.Mixed_7c(x)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 5/5</span></span><br><span class="line">        <span class="comment"># N x 2048 x 8 x 8</span></span><br><span class="line">        <span class="comment"># Adaptive average pooling</span></span><br><span class="line">        x = F.adaptive_avg_pool2d(x, (<span class="number">1</span>, <span class="number">1</span>))</span><br><span class="line">        <span class="comment"># N x 2048 x 1 x 1</span></span><br><span class="line">        x = F.dropout(x, training=self.training)</span><br><span class="line">        <span class="comment"># N x 2048 x 1 x 1</span></span><br><span class="line">        x = torch.flatten(x, <span class="number">1</span>)</span><br><span class="line">        <span class="comment"># N x 2048</span></span><br><span class="line">        x = self.fc(x)</span><br><span class="line">        <span class="comment"># N x 1000 (num_classes)</span></span><br><span class="line">        <span class="keyword">return</span> x, aux</span><br></pre></td></tr></tbody></table></figure>
+<p>（核心）<strong>基本组件：InceptionA、InceptionB、InceptionC、InceptionD、InceptionE、InceptionAux、BasicConv2d</strong></p>
+<blockquote>
+<p>InceptionA</p>
+<p>代码与论文的差异:</p>
+<p>(1) $3\times3$卷积部分多了1个$3\times3$卷积；</p>
+<p>(2) $5\times5$卷积并没有用2个$3\times3$卷积替换</p>
+</blockquote>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/inceptionA.png" alt="inceptionA"></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">InceptionA</span>(nn.Module):</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, in_channels, pool_features, conv_block=<span class="literal">None</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(InceptionA, self).__init__()</span><br><span class="line">        <span class="keyword">if</span> conv_block <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            conv_block = BasicConv2d</span><br><span class="line">        self.branch1x1 = conv_block(in_channels, <span class="number">64</span>, kernel_size=<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">        self.branch5x5_1 = conv_block(in_channels, <span class="number">48</span>, kernel_size=<span class="number">1</span>)</span><br><span class="line">        <span class="comment"># 5*5卷积并没有用2个3*3卷积替换</span></span><br><span class="line">        self.branch5x5_2 = conv_block(<span class="number">48</span>, <span class="number">64</span>, kernel_size=<span class="number">5</span>, padding=<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment">#3*3卷积部分多了1个3*3卷积</span></span><br><span class="line">        self.branch3x3dbl_1 = conv_block(in_channels, <span class="number">64</span>, kernel_size=<span class="number">1</span>)</span><br><span class="line">        self.branch3x3dbl_2 = conv_block(<span class="number">64</span>, <span class="number">96</span>, kernel_size=<span class="number">3</span>, padding=<span class="number">1</span>)</span><br><span class="line">        self.branch3x3dbl_3 = conv_block(<span class="number">96</span>, <span class="number">96</span>, kernel_size=<span class="number">3</span>, padding=<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">        self.branch_pool = conv_block(in_channels, pool_features, kernel_size=<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        branch1x1 = self.branch1x1(x)</span><br><span class="line"></span><br><span class="line">        branch5x5 = self.branch5x5_1(x)</span><br><span class="line">        branch5x5 = self.branch5x5_2(branch5x5)</span><br><span class="line"></span><br><span class="line">        branch3x3dbl = self.branch3x3dbl_1(x)</span><br><span class="line">        branch3x3dbl = self.branch3x3dbl_2(branch3x3dbl)</span><br><span class="line">        branch3x3dbl = self.branch3x3dbl_3(branch3x3dbl)</span><br><span class="line"></span><br><span class="line">        branch_pool = F.avg_pool2d(x, kernel_size=<span class="number">3</span>, stride=<span class="number">1</span>, padding=<span class="number">1</span>)</span><br><span class="line">        branch_pool = self.branch_pool(branch_pool)</span><br><span class="line"></span><br><span class="line">        outputs = [branch1x1, branch5x5, branch3x3dbl, branch_pool]</span><br><span class="line">        <span class="keyword">return</span> outputs</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        outputs = self._forward(x)</span><br><span class="line">        <span class="keyword">return</span> torch.cat(outputs, <span class="number">1</span>)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/inceptionB.png" alt="inceptionB"></p>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/inceptionC.png" alt="inceptionC"></p>
+<p><img src="/2022/07/03/GoogleNet%E7%AC%94%E8%AE%B0/inceptionE.png" alt="inceptionE"></p>
+<h2 id="附：论文原文"><a href="#附：论文原文" class="headerlink" title="附：论文原文"></a>附：论文原文</h2><p>GoogleNetV1：</p>
+
+
+	<div class="row">
+    <embed src="GooglenetV1.pdf" width="100%" height="550" type="application/pdf">
+	</div>
+
+
+
+<p>GoogleNetV2：加入BN层</p>
+
+
+	<div class="row">
+    <embed src="BN.pdf" width="100%" height="550" type="application/pdf">
+	</div>
+
+
+
+<p>GoogleNetV3：改进Inception，提出InceptionV2，InceptionV3</p>
+
+
+	<div class="row">
+    <embed src="V3.pdf" width="100%" height="550" type="application/pdf">
+	</div>
+
+
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">🏷️计算机视觉</a>
+                    
+                        <a href="/tags/%E7%BC%96%E7%A8%8B/">🏷️编程</a>
+                    
+                        <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">🏷️深度学习</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2022/07/02/%E4%BD%BF%E7%94%A8%E8%8F%B2%E6%B6%85%E8%80%B3%E8%A1%8D%E5%B0%84%E6%A8%A1%E5%9E%8B%E8%BF%9B%E8%A1%8C%E4%BA%BA%E7%B1%BB%E5%91%BC%E5%90%B8%E6%A3%80%E6%B5%8B/">论文笔记--使用菲涅耳衍射模型进行人类呼吸检测</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 尹祺翔 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

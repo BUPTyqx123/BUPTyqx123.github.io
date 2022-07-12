@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="尹祺翔">
+
+
+
+
+
+<title>pytorch日积月累-计算图与动态图机制 | yqxBlog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+            <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.2">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">BUPTyqx&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">BUPTyqx&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">pytorch日积月累-计算图与动态图机制</h1>
+            
+                <div class="post-meta">
+                    
+                        🦹‍♀️作者: <a itemprop="author" rel="author" href="/">尹祺翔</a><br>
+                    
+
+                    
+                        <span class="post-time">
+                        ⏲️时间: <a href="#">June 29, 2022&nbsp;&nbsp;13:59:44</a><br>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                            📒目录:
+                            
+                                <a href="/categories/pytorch%E6%97%A5%E7%A7%AF%E6%9C%88%E7%B4%AF/">pytorch日积月累</a><br>
+                            
+                        </span>
+                    
+                    
+                    
+                        <span class="post-count">
+                            📑字数:
+                        <a href="">667</a><br>  
+                        </span>
+                    
+                    
+                        <span class="post-count">
+                    ⏰预计阅读时间:
+                        <a href="">3min</a>  
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="pytorch日积月累3-计算图与动态图机制"><a href="#pytorch日积月累3-计算图与动态图机制" class="headerlink" title="pytorch日积月累3-计算图与动态图机制"></a>pytorch日积月累3-计算图与动态图机制</h1><h2 id="1-计算图"><a href="#1-计算图" class="headerlink" title="1.计算图"></a>1.计算图</h2><p>计算图是用来描述运算的有向无环图。</p>
+<p>计算图有两个主要元素：结点（Node）和边（Edge）</p>
+<p>结点表示数据，如向量，矩阵，张量。边表示运算，如：加减乘除和卷积等。</p>
+<p><img src="/2022/06/29/pytorch%E6%97%A5%E7%A7%AF%E6%9C%88%E7%B4%AF3-%E8%AE%A1%E7%AE%97%E5%9B%BE%E4%B8%8E%E5%8A%A8%E6%80%81%E5%9B%BE%E6%9C%BA%E5%88%B6/image-20200820174927520.png" alt="image-20200820174927520"></p>
+<p>用计算图表示：</p>
+<script type="math/tex; mode=display">
+y=(x+w)\times(w+1)\\
+a=x+w\\
+b=w+1\\
+y=a\times b</script><script type="math/tex; mode=display">
+\begin{aligned}
+\frac{\partial y}{\partial w} &=\frac{\partial y}{\partial a} \frac{\partial a}{\partial w}+\frac{\partial y}{\partial b} \frac{\partial b}{\partial w} \\
+&=b \times 1+a \times 1 \\
+&=b+a \\
+&=(w+1)+(x+w)\\
+&=2 \times w+x+1 \\
+&=2 \times 1+2+1=5
+\end{aligned}</script><p>通过分析可以知道，$y$对$w$求导就是在计算图中找到所有y到w的路径，把路径上的导数进行求和。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line">w = torch.tensor([<span class="number">1.</span>], requires_grad=<span class="literal">True</span>)  </span><br><span class="line"><span class="comment">#由于需要计算梯度，所以requires_grad设置为True</span></span><br><span class="line">x = torch.tensor([<span class="number">2.</span>], requires_grad=<span class="literal">True</span>)  </span><br><span class="line">a = torch.add(w, x)     <span class="comment"># a = w + x</span></span><br><span class="line">b = torch.add(w, <span class="number">1</span>)     <span class="comment"># b = w + 1</span></span><br><span class="line">y = torch.mul(a, b)     <span class="comment"># y = a * b</span></span><br><span class="line">y.backward()    <span class="comment">#对y进行反向传播</span></span><br><span class="line"><span class="built_in">print</span>(w.grad)   <span class="comment">#输出w的梯度</span></span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/06/29/pytorch%E6%97%A5%E7%A7%AF%E6%9C%88%E7%B4%AF3-%E8%AE%A1%E7%AE%97%E5%9B%BE%E4%B8%8E%E5%8A%A8%E6%80%81%E5%9B%BE%E6%9C%BA%E5%88%B6/image-20220629141639551.png" alt="image-20220629141639551"></p>
+<p><strong>叶子节点</strong>：用户创建的结点称为叶子结点，如$X$与$W$；</p>
+<p><strong>is_leaf</strong>：指示张量是否为叶子节点；</p>
+<p>​       叶子节点是整个计算图的根基，例如前面求导的计算图，在前向传导中的$a$、$b$和$y$都要依据创建的叶子节点$x$和$w$进行计算的。同样，在反向传播过程中，所有梯度的计算都要依赖叶子节点。</p>
+<p>​       设置叶子节点主要是为了节省内存，在梯度反向传播结束之后，非叶子节点的梯度都会被释放掉。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查看叶子结点,通过运算得来的结点不是叶子结点</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">"is_leaf:\n"</span>, w.is_leaf, x.is_leaf, a.is_leaf, b.is_leaf, y.is_leaf)  </span><br><span class="line"><span class="comment">#输出为True True False False False，只有前面两个是叶子节点</span></span><br><span class="line"><span class="comment">#查看梯度</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">"gradient:\n"</span>, w.grad, x.grad, a.grad, b.grad, y.grad)  </span><br><span class="line"><span class="comment">#输出为tensor([5.]) tensor([2.]) None None None，因为非叶子节点都被释放掉了</span></span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/06/29/pytorch%E6%97%A5%E7%A7%AF%E6%9C%88%E7%B4%AF3-%E8%AE%A1%E7%AE%97%E5%9B%BE%E4%B8%8E%E5%8A%A8%E6%80%81%E5%9B%BE%E6%9C%BA%E5%88%B6/image-20220629141656964.png" alt="image-20220629141656964">      </p>
+<p>如果想使用非叶子结点梯度，可以<strong>使用pytorch中</strong><code>retain_grad()</code>。例如对上面代码中的$a$执行相关操作<code>a.retain_grad()</code>，则$a$的梯度会被保留下来，$b$和$y$的梯度会被释放掉。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a.retain_grad()  </span><br><span class="line"><span class="comment">#保存非叶子结点a的梯度，输出为tensor([5.]) tensor([2.]) tensor([2.]) None None</span></span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/06/29/pytorch%E6%97%A5%E7%A7%AF%E6%9C%88%E7%B4%AF3-%E8%AE%A1%E7%AE%97%E5%9B%BE%E4%B8%8E%E5%8A%A8%E6%80%81%E5%9B%BE%E6%9C%BA%E5%88%B6/image-20220629141730950.png" alt="image-20220629141730950">        </p>
+<p><code>torch.Tensor</code>中还有一个属性为<code>grad_fn</code>，<code>grad_fn</code>的作用是记录创建该张量时所用的方法（函数），该属性在梯度反向传播的时候用到。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看 grad_fn</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">"grad_fn:\n"</span>, w.grad_fn, x.grad_fn, a.grad_fn, b.grad_fn, y.grad_fn)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/06/29/pytorch%E6%97%A5%E7%A7%AF%E6%9C%88%E7%B4%AF3-%E8%AE%A1%E7%AE%97%E5%9B%BE%E4%B8%8E%E5%8A%A8%E6%80%81%E5%9B%BE%E6%9C%BA%E5%88%B6/image-20220629141718155.png" alt="image-20220629141718155"></p>
+<h2 id="2-动态图"><a href="#2-动态图" class="headerlink" title="2.动态图"></a>2.动态图</h2><p>动态图：pytorch使用的，运算与搭建同时进行；灵活，易调节。</p>
+<p>静态图：tensorflow使用的，先搭建图，后运算；高效，不灵活。</p>
+<p>根据计算图搭建方式，可将计算图分为动态图和静态图。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E7%BC%96%E7%A8%8B/">🏷️编程</a>
+                    
+                        <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">🏷️深度学习</a>
+                    
+                        <a href="/tags/Pytorch/">🏷️Pytorch</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2022/06/29/pytorch%E6%97%A5%E7%A7%AF%E6%9C%88%E7%B4%AF4-%E6%A2%AF%E5%BA%A6%E4%B8%8E%E8%87%AA%E5%8A%A8%E6%B1%82%E5%AF%BC/">pytorch日积月累-梯度与自动求导</a>
+            
+            
+            <a class="next" rel="next" href="/2022/06/29/pytorch%E6%97%A5%E7%A7%AF%E6%9C%88%E7%B4%AF2-%E5%BC%A0%E9%87%8F%E6%93%8D%E4%BD%9C/">pytorch日积月累-张量操作</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 尹祺翔 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

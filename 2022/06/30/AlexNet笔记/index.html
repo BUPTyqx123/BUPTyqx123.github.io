@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="尹祺翔">
+
+
+
+
+
+<title>AlexNet模型笔记 | yqxBlog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+            <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.2">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">BUPTyqx&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">BUPTyqx&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">AlexNet模型笔记</h1>
+            
+                <div class="post-meta">
+                    
+                        🦹‍♀️作者: <a itemprop="author" rel="author" href="/">尹祺翔</a><br>
+                    
+
+                    
+                        <span class="post-time">
+                        ⏲️时间: <a href="#">June 30, 2022&nbsp;&nbsp;0:37:16</a><br>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                            📒目录:
+                            
+                                <a href="/categories/CVBaseline/">CVBaseline</a><br>
+                            
+                        </span>
+                    
+                    
+                    
+                        <span class="post-count">
+                            📑字数:
+                        <a href="">2,569</a><br>  
+                        </span>
+                    
+                    
+                        <span class="post-count">
+                    ⏰预计阅读时间:
+                        <a href="">10min</a>  
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="CVbaseline-AlexNet笔记"><a href="#CVbaseline-AlexNet笔记" class="headerlink" title="CVbaseline-AlexNet笔记"></a>CVbaseline-AlexNet笔记</h1><p><strong>AlexNet : ImageNet Classification with Deep Convolutional Neural Networks</strong></p>
+<blockquote>
+<p>模型结构设计：ReLU，LRN，Overlapping pooling，双GPU训练</p>
+<p>减轻过拟合：图像增强，DropOut</p>
+<p>ILSVRC</p>
+<p>卷积核可视化</p>
+</blockquote>
+<h2 id="1-研究背景"><a href="#1-研究背景" class="headerlink" title="1.研究背景"></a>1.研究背景</h2><p>常见的图像分类数据集：</p>
+<p><img src="/2022/06/30/AlexNet%E7%AC%94%E8%AE%B0/image-20200728000522026.png" alt="image-20200728000522026" style="zoom:77%;"></p>
+<p><strong>ILSVRC：大规模图像识别挑战赛</strong></p>
+<p>ImageNet Large Scale Visual Recognition Challenge 是李飞飞等人于2010年创办的图像识别挑战赛，自2010起连续举办8年，极大地推动计算机视觉发展。</p>
+<p>比赛项目涵盖：</p>
+<blockquote>
+<p>图像分类(Classification)</p>
+<p>目标定位(Object localization)</p>
+<p>目标检测(Object detection)</p>
+<p>视频目标检测(Object detection from video)</p>
+<p>场景分类(Scene classification)</p>
+<p>场景解析(Scene parsing)</p>
+</blockquote>
+<p>竞赛中脱颖而出大量经典模型： Alexnet，VGG，GoogleNet，ResNet，DenseNet等</p>
+<p>ImageNet 数据集包含 21841 个类别，14,197,122张图片其通过WordNet对类别进行分组，使数据集的语义信息更合理，非常适合图像识别ILSVRC-2012 从ImageNet中挑选1000类的1,200,000张作为训练集。</p>
+<p><strong>Top5 error的含义：</strong></p>
+<p><img src="/2022/06/30/AlexNet%E7%AC%94%E8%AE%B0/image-20210221113011381.png" alt="image-20210221113011381"></p>
+<p><strong>AlexNet网络的成果：</strong></p>
+<p><img src="/2022/06/30/AlexNet%E7%AC%94%E8%AE%B0/image-20210221113443071.png" alt="image-20210221113443071"></p>
+<h2 id="2-研究成果和意义"><a href="#2-研究成果和意义" class="headerlink" title="2.研究成果和意义"></a>2.研究成果和意义</h2><p><img src="/2022/06/30/AlexNet%E7%AC%94%E8%AE%B0/image-20200728001859459.png" alt="image-20200728001859459" style="zoom:50%;"></p>
+<p>AlexNet在ILSVRC-2012以超出第二名10.9个百分点夺冠</p>
+<p>SIFT+FVS：ILSVRC-2012 分类任务第二名</p>
+<p>1CNN ：训练一个AlexNet</p>
+<p>5CNNs ：训练五个AlexNet取平均值</p>
+<p>1CNN*在最后一个池化层之后，额外添加第六个卷积层，并使用ImageNet 2011（秋）数据集上预训练</p>
+<p>7CNNs* 两个预训练微调，与5CNNs取平均值</p>
+<p><strong>历史意义：</strong></p>
+<ul>
+<li>拉开卷积神经网络统计计算机视觉的序幕</li>
+<li>加速计算机视觉应用落地</li>
+</ul>
+<p>这篇论文的重大历史意义在于：AlexNet拉开卷积神经网络统治计算机视觉的序幕，加速计算机视觉应用落地。使研究问题的方法由机器学习领域的特征提取—&gt;特征筛选—-&gt;输入分类器的过程，逐渐进化到深度学习领域的特征工程和分类集成为一体。</p>
+<p>在安防领域的人脸识别、行人检测、智能视频分析、行人跟踪等，交通领域的交通场景物体识别、车辆计数、逆行检测、车牌检测与识别，以及互联网领域的基于内容的图像检索、相册自动归类等方面有着广泛的应用。</p>
+<h2 id="3-论文结构"><a href="#3-论文结构" class="headerlink" title="3.论文结构"></a>3.论文结构</h2><p><strong>摘要 Abstract</strong>：介绍背景及提出AlexNet模型，获得ILSVRC-2012冠军</p>
+<p><strong>Introduction</strong>：研究的成功得益于大量数据及高性能GPU；介绍本论文主要贡献</p>
+<p><strong>The Dataset</strong>：ILSVRC数据集简介；图片预处理细节</p>
+<p><strong>The Architecture</strong>：AlexNet网络结构及其内部细节：ReLU、GPU、LRN、Overlapping，Pooling</p>
+<p><strong>Reducing Overfitting</strong>：防过拟合技术，数据增强和dropout</p>
+<p><strong>Details of learning</strong>：实验参数设置：超参调整，权重初始化</p>
+<p><strong>Results</strong>：AlexNet比赛指标、成绩及其详细设置</p>
+<p><strong>Qualitative Evaluations</strong>：实验探究，分析卷积核模式，模型输出合理性，高级特征的相似性</p>
+<p><strong>Discussion</strong>：强调网络结构之间的强关联，提出进一步研究方向</p>
+<h2 id="4-摘要"><a href="#4-摘要" class="headerlink" title="4.摘要"></a>4.摘要</h2><ul>
+<li><p>在ILSVRC-2010的120万张图片上训练深度卷积神经网络，获得最优结果，top-1和top-5error分别为 37.5%, 17%</p>
+</li>
+<li><p>该网络（AlexNet）由<strong>5个卷积层和3个全连接层</strong>构成，共计6000万参数，65万个神经元</p>
+</li>
+<li><p>为加快训练，采用非饱和激活函数——<strong>ReLU</strong>，采用GPU训练</p>
+</li>
+<li><p>为减轻过拟合，采用<strong>Dropout</strong></p>
+</li>
+<li><p>基于以上模型及技巧，在ILSVRC-2012以超出第二名10.9个百分点成绩夺冠</p>
+</li>
+</ul>
+<h2 id="5-网络结构"><a href="#5-网络结构" class="headerlink" title="5.网络结构"></a>5.网络结构</h2><p>论文3.5部分</p>
+<p>网络模型结构：</p>
+<p><img src="/2022/06/30/AlexNet%E7%AC%94%E8%AE%B0/image-20210221120219972.png" alt="image-20210221120219972"></p>
+<p>卷积输出特征图：</p>
+<script type="math/tex; mode=display">
+F_{o}=\left\lfloor\frac{F_{\text {in }}-k+2 p}{s}\right \rfloor+1</script><p>$ F_{\text {in }}$输入特征图尺寸，$k$表示kernel size，$p$表示padding，$s$表示步长</p>
+<p><img src="/2022/06/30/AlexNet%E7%AC%94%E8%AE%B0/image-20200728005043772.png" alt="image-20200728005043772"></p>
+<p>连接数量计算公式：$F_{i} \times\left(K_{s} \times K_{s}\right) \times K_{n}+K_{n}$,6000万参数的来源：</p>
+<p><img src="/2022/06/30/AlexNet%E7%AC%94%E8%AE%B0/image-20200728005347871.png" alt="image-20200728005347871"></p>
+<p><strong>AlexNet 结构特点</strong>：</p>
+<p><img src="/2022/06/30/AlexNet%E7%AC%94%E8%AE%B0/image-20210221120618089.png" alt="image-20210221120618089"></p>
+<blockquote>
+<ul>
+<li>The Architecture</li>
+<li>ReLU Nonlinearity</li>
+<li>Training on Multiple GPUs</li>
+<li>Local Response Normalization</li>
+<li>Overlapping Pooling </li>
+</ul>
+</blockquote>
+<h3 id="5-1RELU"><a href="#5-1RELU" class="headerlink" title="5.1RELU"></a>5.1RELU</h3><p><strong>ReLU Nonlinearity</strong>  Relu优点：</p>
+<ul>
+<li><p>使网络训练更快</p>
+</li>
+<li><p>防止梯度消失（弥散）</p>
+</li>
+<li><p>使网络具有稀疏性</p>
+</li>
+</ul>
+<p>sigmod激活函数：${y}=\frac{1}{1+e^{-x}}$，其梯度表示为：$y’=y\times(1-y)$</p>
+<p>Relu激活函数：$\mathbf{y}=\max (\mathbf{0}, x)$，梯度表示：$y^{\prime}=\left\{\begin{array}{cc}<br>1, &amp; x&gt;0 \\<br>\text { undefined, } &amp; x=0 \\<br>0, &amp; x&lt;0<br>\end{array}\right.$</p>
+<h3 id="5-2LRN"><a href="#5-2LRN" class="headerlink" title="5.2LRN"></a>5.2LRN</h3><p><strong>Local Response Normalization</strong></p>
+<p>局部响应标准化：有助于AlexNet<strong>泛化能力的提升</strong>受真实神经元<strong>侧抑制(lateral inhibition)</strong>启发。</p>
+<p><strong>侧抑制</strong>：细胞分化变为不同时，它会对周围细胞产生抑制信号，阻止它们向相同方向分化，最终表现为细胞命运的不同。</p>
+<script type="math/tex; mode=display">
+b_{x, y}^{i}=a_{x, y}^{i} /\left(k+\alpha \sum_{j=\max (0, i-n / 2)}^{\min (N-1, i+n / 2)}\left(a_{x, y}^{j}\right)^{2}\right)^{\beta}</script><p><img src="/2022/06/30/AlexNet%E7%AC%94%E8%AE%B0/image-20210221121348588.png" alt="image-20210221121348588" style="zoom:50%;"></p>
+<blockquote>
+<p>$k = 2, n = 5$, $\alpha = 10^{−4}$, and $\beta = 0.75$</p>
+<p>$i$：代表通道 channel</p>
+<p>$j$：平方累加索引，代表从j～i的像素值平方求和</p>
+<p>$x,y$：像素的位置，公式中用不到</p>
+<p>$a$：代表feature map里面的 i 对应像素的具体值</p>
+<p>$N$：每个feature map里面最内层向量的列数</p>
+<p>$k$：超参数，由原型中的blas指定</p>
+<p>$α$：超参数，由原型中的alpha指定</p>
+<p>$n/2$：超参数，由原型中的deepth_radius指定</p>
+<p>$β$：超参数，由原型中的belta指定</p>
+</blockquote>
+<h3 id="5-3Overlapping-Pooling"><a href="#5-3Overlapping-Pooling" class="headerlink" title="5.3Overlapping Pooling"></a>5.3Overlapping Pooling</h3><p>重叠池化，池化过程中会有一部分的重叠</p>
+<p><img src="/2022/06/30/AlexNet%E7%AC%94%E8%AE%B0/image-20210221122144772.png" alt="image-20210221122144772"></p>
+<p>alexnet中提出和使用。</p>
+<p>相对于传统的no-overlapping pooling，采用Overlapping Pooling不仅可以提升预测精度，同时一定程度上可以减缓过拟合。</p>
+<p>相比于正常池化（步长s=2，窗口z=2） 重叠池化(步长s=2，窗口z=3) 可以减少top-1, top-5分别为0.4% 和0.3%；重叠池化可以避免过拟合。</p>
+<h2 id="6-训练技巧"><a href="#6-训练技巧" class="headerlink" title="6.训练技巧"></a>6.训练技巧</h2><h3 id="6-1Data-Augmentation"><a href="#6-1Data-Augmentation" class="headerlink" title="6.1Data Augmentation"></a>6.1Data Augmentation</h3><p>数据增强</p>
+<blockquote>
+<p>方法一：针对<strong>位置</strong></p>
+</blockquote>
+<p>训练阶段：</p>
+<ul>
+<li><p>图片统一缩放至256*256</p>
+</li>
+<li><p>随机位置裁剪出224*224区域</p>
+</li>
+<li>随机进行水平翻转</li>
+</ul>
+<p>测试阶段：</p>
+<ul>
+<li><p>图片统一缩放至256*256</p>
+</li>
+<li><p>裁剪出5个224*224区域</p>
+</li>
+<li><p>均进行水平翻转，共得到10张224*224图片</p>
+</li>
+</ul>
+<blockquote>
+<p>方法二：针对<strong>颜色</strong></p>
+</blockquote>
+<p><img src="/2022/06/30/AlexNet%E7%AC%94%E8%AE%B0/image-20210221122855330.png" alt="image-20210221122855330"></p>
+<p>进行主成分分析，进行RGB的图像扰动</p>
+<p>通过PCA方法修改RGB通道的像素值，实现颜色扰动，效果有限，仅在top-1提升1个点（top-1 acc约62.5%）</p>
+<h3 id="6-2DropOut"><a href="#6-2DropOut" class="headerlink" title="6.2DropOut"></a>6.2DropOut</h3><p>Dropout：随机失活</p>
+<p>随机<strong>：dropout probability （eg：p=0.5）</strong></p>
+<p>失活<strong>：weight = 0</strong></p>
+<p>注意事项：训练和测试两个阶段的<strong>数据尺度变化</strong></p>
+<p>测试时，神经元输出值需要乘以 p</p>
+<p><img src="/2022/06/30/AlexNet%E7%AC%94%E8%AE%B0/image-20210221123209283.png" alt="image-20210221123209283" style="zoom:57%;"></p>
+<p>因而，对于一个有N个节点的神经网络，有了dropout后，就可以看做是$2^n$个模型的集合了，但此时要训练的参数数目却是不变的，这就解脱了费时的问题。</p>
+<p>而为了达到ensemble的特性，有了dropout后，神经网络的训练和预测就会发生一些变化。</p>
+<p>对应的公式变化如下如下：</p>
+<p><img src="/2022/06/30/AlexNet%E7%AC%94%E8%AE%B0/20200827215925960.png" alt="img"></p>
+<ul>
+<li>没有dropout的神经网络:</li>
+</ul>
+<script type="math/tex; mode=display">
+\begin{aligned}
+z_{i}^{(l+1)} &=\mathbf{w}_{i}^{(l+1)} \mathbf{y}^{l}+b_{i}^{(l+1)} \\
+y_{i}^{(l+1)} &=f\left(z_{i}^{(l+1)}\right)
+\end{aligned}</script><ul>
+<li>有dropout的神经网络：</li>
+</ul>
+<script type="math/tex; mode=display">
+\begin{aligned}
+r_{j}^{(l)} & \sim \operatorname{Bernoulli}(p) \\
+\widetilde{\mathbf{y}}^{(l)} &=\mathbf{r}^{(l)} * \mathbf{y}^{(l)} \\
+z_{i}^{(l+1)} &=\mathbf{w}_{i}^{(l+1)} \widetilde{\mathbf{y}}^{l}+b_{i}^{(l+1)} \\
+y_{i}^{(l+1)} &=f\left(z_{i}^{(l+1)}\right)
+\end{aligned}</script><ul>
+<li>测试层面：预测的时候，每一个单元的参数要预乘以p。</li>
+</ul>
+<p><img src="/2022/06/30/AlexNet%E7%AC%94%E8%AE%B0/20200827220040979.png" alt="img" style="zoom:67%;"></p>
+<h2 id="7-实验结果及分析"><a href="#7-实验结果及分析" class="headerlink" title="7.实验结果及分析"></a>7.实验结果及分析</h2><p><strong>Qualitative Evaluations 卷积核可视化</strong></p>
+<p>• 卷积核呈现出不同的频率、方向和颜色</p>
+<p>• 两个GPU还呈现分工学习（一个负责频率方向，一个负责颜色）</p>
+<p><img src="/2022/06/30/AlexNet%E7%AC%94%E8%AE%B0/image-20210221124248297.png" alt="image-20210221124248297"></p>
+<blockquote>
+<p><em>This kind of specialization occurs during every run and is independent of any particular random weight initialization (modulo a renumbering of the GPUs).</em></p>
+<p>即便是随机的参数设置，GPU也呈现出分工的模式。</p>
+</blockquote>
+<p><strong>Qualitative Evaluations</strong>特征的相似性</p>
+<p>相似图片的第二个全连接层输出<strong>特征向量</strong>的欧式距离<strong>相近</strong></p>
+<p>启发：</p>
+<ul>
+<li>可用AlexNet提取高级特征进行图像检索、图像聚类、图像编码</li>
+</ul>
+<p><img src="/2022/06/30/AlexNet%E7%AC%94%E8%AE%B0/image-20210221124125947.png" alt="image-20210221124125947"></p>
+<h2 id="8-总结"><a href="#8-总结" class="headerlink" title="8.总结"></a>8.总结</h2><p><strong>关键点</strong></p>
+<p>• 大量带标签数据——ImageNet</p>
+<p>• 高性能计算资源——GPU</p>
+<p>• 合理算法模型——深度卷积神经网络</p>
+<p><strong>创新点</strong></p>
+<p>• 采用ReLu加快大型神经网络训练</p>
+<p>• 采用LRN提升大型网络泛化能力</p>
+<p>• 采用Overlapping Pooling提升指标</p>
+<p>• 采用随机裁剪翻转及色彩扰动增加数据多样性</p>
+<p>• 采用Drpout减轻过拟合</p>
+<p><strong>启发点</strong></p>
+<p>• 深度与宽度可决定网络能力</p>
+<blockquote>
+<p><em>Their capacity can be controlled by varying their depth and breadth.</em></p>
+</blockquote>
+<p>• 更强大GPU及更多数据可进一步提高模型性能</p>
+<blockquote>
+<p><em>All of our experiments suggest that our results can be improved simply by waiting for faster GPUs and bigger datasets to become available.</em></p>
+</blockquote>
+<p>• 图片缩放细节，对短边先缩放</p>
+<blockquote>
+<p><em>Given a rectangular image, we first rescaled the image such that the shorter side was of length 256, and then cropped out the central 256×256 patch from the resulting image.</em></p>
+</blockquote>
+<p>• ReLU不需要对输入进行标准化来防止饱和现象，即说明sigmoid/tanh激活函数有必要对输入进行标准化</p>
+<blockquote>
+<p><em>ReLUs have the desirable property that they do not require input normalization to prevent them from saturating</em></p>
+</blockquote>
+<p>• 卷积核学习到频率、方向和颜色特征</p>
+<blockquote>
+<p><em>The network has learned a variety of frequency- and orientation-selective kernels, as well as various colored blobs.</em></p>
+</blockquote>
+<p>• 相似图片具有“相近”的高级特征</p>
+<blockquote>
+<p><em>If two images produce feature activation vectors with a small Euclidean separation, we can say that the higher levels of the neural network consider them to be similar.</em></p>
+</blockquote>
+<p>• 图像检索可基于高级特征，效果应该优于基于原始图像</p>
+<blockquote>
+<p><em>This should produce a much better image retrieval method than applying autoencoders to the raw pixels.</em></p>
+</blockquote>
+<p>• 网络结构具有相关性，不可轻易移除某一层</p>
+<blockquote>
+<p><em>It is notable that our network’s performance degrades if a single convolutional layer is removed.</em></p>
+</blockquote>
+<p>• 采用视频数据，可能有新突破</p>
+<blockquote>
+<p><em>Ultimately we would like to use very large and deep convolutional nets on video sequences.</em></p>
+</blockquote>
+<h2 id="9代码"><a href="#9代码" class="headerlink" title="9代码"></a>9代码</h2><h3 id="9-1关键函数"><a href="#9-1关键函数" class="headerlink" title="9.1关键函数"></a>9.1关键函数</h3><p>1.<strong>torch.topk</strong>:用于寻找top-5的预测</p>
+<p>功能：找出前k大的数据，及其索引序号</p>
+<p>input：张量   k：决定选取k个值    dim：索引维度</p>
+<p>返回：Tensor：前k大的值    LongTensor：前k大的值所在的位置</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">torch.topk(<span class="built_in">input</span>, k, dim=<span class="literal">None</span>, largest=<span class="literal">True</span>, <span class="built_in">sorted</span>=<span class="literal">True</span>, out=<span class="literal">None</span>)</span><br></pre></td></tr></tbody></table></figure>
+<p>2.<strong>FiveCrop</strong>，<strong>TenCrop</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">transforms.FiveCrop(size)</span><br><span class="line">transforms.TenCrop(size, vertical_flip=<span class="literal">False</span>)</span><br></pre></td></tr></tbody></table></figure>
+<p>功能：在图像的上下左右以及中心裁剪出尺寸为size的5张图片，TenCrop对这5张图片进行水平或者垂直镜像获得10张图片。</p>
+<p>size：所需裁剪图片尺寸   vertical_flip：是否垂直翻转</p>
+<p>3.<strong>torchvision.utils.make_grid</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make_grid(tensor, nrow=<span class="number">8</span>, padding=<span class="number">2</span>, normalize=<span class="literal">False</span>, <span class="built_in">range</span>=<span class="literal">None</span>, scale_each=<span class="literal">False</span>, pad_value=<span class="number">0</span>)</span><br></pre></td></tr></tbody></table></figure>
+<ul>
+<li>tensor：图像数据, <code>B*C*H*W</code>形式</li>
+<li>nrow：行数（列数自动计算）</li>
+<li>padding：图像间距（像素单位）</li>
+<li>normalize：是否将像素值标准化</li>
+<li>range：标准化范围</li>
+<li>scale_each：是否单张图维度标准化</li>
+<li>pad_value：padding的像素值</li>
+</ul>
+<h2 id="论文原文"><a href="#论文原文" class="headerlink" title="论文原文"></a>论文原文</h2>
+
+	<div class="row">
+    <embed src="AlexNet.pdf" width="100%" height="550" type="application/pdf">
+	</div>
+
+
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">🏷️计算机视觉</a>
+                    
+                        <a href="/tags/%E7%BC%96%E7%A8%8B/">🏷️编程</a>
+                    
+                        <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">🏷️深度学习</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2022/06/30/pytorch%E6%97%A5%E7%A7%AF%E6%9C%88%E7%B4%AF8-%E6%9D%83%E5%80%BC%E5%88%9D%E5%A7%8B%E5%8C%96/">pytorch日积月累-权值初始化</a>
+            
+            
+            <a class="next" rel="next" href="/2022/06/30/pytorch%E6%97%A5%E7%A7%AF%E6%9C%88%E7%B4%AF7-%E6%A8%A1%E5%9E%8B%E5%BB%BA%E7%AB%8B/">pytorch日积月累-模型建立</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 尹祺翔 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
