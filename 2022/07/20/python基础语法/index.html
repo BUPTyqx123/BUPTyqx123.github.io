@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="尹祺翔">
+
+
+
+
+
+<title>python基本操作 | yqxBlog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+            <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.2">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">BUPTyqx&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">BUPTyqx&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">python基本操作</h1>
+            
+                <div class="post-meta">
+                    
+                        🦹‍♀️作者: <a itemprop="author" rel="author" href="/">尹祺翔</a><br>
+                    
+
+                    
+                        <span class="post-time">
+                        ⏲️时间: <a href="#">July 20, 2022&nbsp;&nbsp;15:55:10</a><br>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                            📒目录:
+                            
+                                <a href="/categories/python%E6%97%A5%E7%A7%AF%E6%9C%88%E7%B4%AF/">python日积月累</a><br>
+                            
+                        </span>
+                    
+                    
+                    
+                        <span class="post-count">
+                            📑字数:
+                        <a href="">1,636</a><br>  
+                        </span>
+                    
+                    
+                        <span class="post-count">
+                    ⏰预计阅读时间:
+                        <a href="">7min</a>  
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="1-python基本操作"><a href="#1-python基本操作" class="headerlink" title="1.python基本操作"></a>1.python基本操作</h2><h3 id="1-1Python关键字"><a href="#1-1Python关键字" class="headerlink" title="1.1Python关键字"></a>1.1Python关键字</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span>  keyword</span><br><span class="line"><span class="built_in">print</span>(keyword.kwlist )</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/20/python%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95/image-20220720155752182.png" alt="image-20220720155752182"></p>
+<h3 id="1-2Python核心数据类型"><a href="#1-2Python核心数据类型" class="headerlink" title="1.2Python核心数据类型"></a>1.2Python核心数据类型</h3><ul>
+<li>数字（整数，浮点数，复数，布尔型数）</li>
+<li>字符串</li>
+<li>列表</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'''TempConvert.py</span></span><br><span class="line"><span class="string">温度转换实例'''</span></span><br><span class="line">TempStr = <span class="built_in">input</span>(<span class="string">"请输入带有符号的温度值："</span>)</span><br><span class="line"><span class="keyword">if</span> TempStr[-<span class="number">1</span>] <span class="keyword">in</span> [<span class="string">'F'</span>,<span class="string">'f'</span>]:</span><br><span class="line">    C=(<span class="built_in">eval</span>(TempStr[<span class="number">0</span>:-<span class="number">1</span>]) - <span class="number">32</span>) / <span class="number">1.8</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"转换后的温度是{:.2f}C"</span>.<span class="built_in">format</span>(C))</span><br><span class="line"><span class="keyword">elif</span> TempStr[-<span class="number">1</span>] <span class="keyword">in</span>[<span class="string">'C'</span>,<span class="string">'c'</span>]:</span><br><span class="line">    F=<span class="number">1.8</span> * <span class="built_in">eval</span>(TempStr[<span class="number">0</span>:-<span class="number">1</span>]) + <span class="number">32</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"转换后的温度是{:.2f}F"</span>.<span class="built_in">format</span>(F))</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"输入格式错误"</span>)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/20/python%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95/image-20220720160000065.png" alt="image-20220720160000065"></p>
+<h3 id="1-3is-is-not运算符"><a href="#1-3is-is-not运算符" class="headerlink" title="1.3is/is not运算符"></a>1.3is/is not运算符</h3><p>作用：判断两个对象是否绑定同一个对象，如果是同一个对象返回True，如果不是，返回False</p>
+<p>1、<code>is</code>,<code>is not</code>对比的是两个变量的内存地址</p>
+<p>2、<code>==</code>,<code>!=</code>对比的是两个变量的值</p>
+<p><img src="/2022/07/20/python%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95/image-20220720160233890.png" alt="image-20220720160233890"></p>
+<h3 id="1-4小整数对象池"><a href="#1-4小整数对象池" class="headerlink" title="1.4小整数对象池"></a>1.4小整数对象池</h3><p>python中整数-5到256永远存在于小整数池中，不会释放，可重复使用</p>
+<p>调用这个区间内的数字时，会从小整数对象池中直接绑定，而不会重新创建。</p>
+<h3 id="1-5id-函数"><a href="#1-5id-函数" class="headerlink" title="1.5id( )函数"></a>1.5id( )函数</h3><p> 格式：<code>id(对象)</code></p>
+<p> 作用：返回对象的地址 </p>
+<p><img src="/2022/07/20/python%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95/image-20220720160509027.png" alt="image-20220720160509027"></p>
+<h3 id="1-6del语句"><a href="#1-6del语句" class="headerlink" title="1.6del语句"></a>1.6del语句</h3><p>作用：用于删除变量，同时删除与对象的关联关系，如果可能，则释放对象</p>
+<p>格式： <code>del 变量名</code></p>
+<p>Python的内存管理和引用计数：每个对象都会记录有几个变量引用自身，当引用数量为0时，则对象销毁，此种自动化管理的方式叫引用计数。</p>
+<ul>
+<li>使用del语句，删除到变量到对象的引用和变量名称本身</li>
+<li>注意del语句作用在变量上，而不是数据对象上</li>
+</ul>
+<p><img src="/2022/07/20/python%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95/image-20220720160728394.png" alt="image-20220720160728394"></p>
+<h3 id="1-7内建的数值型函数"><a href="#1-7内建的数值型函数" class="headerlink" title="1.7内建的数值型函数"></a>1.7内建的数值型函数</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">abs</span>( )                  <span class="comment"># 绝对值函数</span></span><br><span class="line"><span class="built_in">round</span>(number[,ndigits]) <span class="comment"># 对数值进行四舍五入（如果ndigits为负数反向取小数点）</span></span><br><span class="line"><span class="built_in">pow</span>(x,y,z=<span class="literal">None</span>)         <span class="comment"># 相当于x^y或{x^ymod z }</span></span><br><span class="line"><span class="built_in">help</span>( )                 <span class="comment"># 函数可查看函数帮助文档  help(函数名)</span></span><br></pre></td></tr></tbody></table></figure>
+<h3 id="1-8基本输入输出函数"><a href="#1-8基本输入输出函数" class="headerlink" title="1.8基本输入输出函数"></a>1.8基本输入输出函数</h3><p>基本输入函数<code>input</code>：</p>
+<ul>
+<li>作用：从标准输入设置上读取一个字符串（末尾的换行符会被删除）</li>
+<li>格式：<code>input('提示字符串')</code></li>
+<li>提示字符串可以为空</li>
+</ul>
+<p>基本输出函数<code>print</code></p>
+<ul>
+<li>作用：将一系列的值以字符串的形式输出到标准输出设备上，默认为终端</li>
+<li>格式：<code>print(value,...,sep=’ ’,end=’\n’)</code></li>
+<li>sep表示两个值之间的分隔符，默认为一个空格</li>
+<li>end输出完毕后再流末尾自动追加一个字符，默认为换行符<code>\n</code></li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'''TempConvert.py</span></span><br><span class="line"><span class="string">温度转换实例'''</span></span><br><span class="line">TempStr = <span class="built_in">input</span>(<span class="string">"请输入带有符号的温度值："</span>)</span><br><span class="line"><span class="keyword">if</span> TempStr[-<span class="number">1</span>] <span class="keyword">in</span> [<span class="string">'F'</span>,<span class="string">'f'</span>]:</span><br><span class="line">    C=(<span class="built_in">eval</span>(TempStr[<span class="number">0</span>:-<span class="number">1</span>]) - <span class="number">32</span>) / <span class="number">1.8</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"转换后的温度是{:.2f}C"</span>.<span class="built_in">format</span>(C))</span><br><span class="line"><span class="keyword">elif</span> TempStr[-<span class="number">1</span>] <span class="keyword">in</span>[<span class="string">'C'</span>,<span class="string">'c'</span>]:</span><br><span class="line">    F=<span class="number">1.8</span> * <span class="built_in">eval</span>(TempStr[<span class="number">0</span>:-<span class="number">1</span>]) + <span class="number">32</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"转换后的温度是{:.2f}F"</span>.<span class="built_in">format</span>(F))</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"输入格式错误"</span>)</span><br></pre></td></tr></tbody></table></figure>
+<h2 id="2-format格式化"><a href="#2-format格式化" class="headerlink" title="2.format格式化"></a>2.format格式化</h2><h3 id="2-1槽机制"><a href="#2-1槽机制" class="headerlink" title="2.1槽机制"></a>2.1槽机制</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(<span class="string">'{} {}'</span>.<span class="built_in">format</span>(<span class="string">'hello'</span>, <span class="string">'world'</span>))  <span class="comment"># 最基本的</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">'{0} {1}'</span>.<span class="built_in">format</span>(<span class="string">'hello'</span>, <span class="string">'world'</span>))  <span class="comment"># 通过位置参数</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">'{0} {1} {0}'</span>.<span class="built_in">format</span>(<span class="string">'hello'</span>, <span class="string">'world'</span>))  <span class="comment"># 单个参数多次输出</span></span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/20/python%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95/image-20220720161552068.png" alt="image-20220720161552068"></p>
+<h3 id="2-2关键词定位"><a href="#2-2关键词定位" class="headerlink" title="2.2关键词定位"></a>2.2关键词定位</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 通过关键词参数</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">'我的名字是{name},我今年{age}岁了。'</span>.<span class="built_in">format</span>(name = <span class="string">'小明'</span>, age = <span class="string">'12'</span>))</span><br><span class="line"><span class="comment"># 与位置参数一样，单个参数也能多次输出</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">'{name}说："我的名字是{name},我今年{age}岁了。"'</span>.<span class="built_in">format</span>(name = <span class="string">'小明'</span>, age=<span class="string">'12'</span>))</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/20/python%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95/image-20220720161624746.png" alt="image-20220720161624746"></p>
+<h3 id="2-3可变参数"><a href="#2-3可变参数" class="headerlink" title="2.3可变参数"></a>2.3可变参数</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 传入list</span></span><br><span class="line">data = [<span class="string">'hello'</span>, <span class="string">'world'</span>]</span><br><span class="line"><span class="built_in">print</span>(<span class="string">'{0} {1}'</span>.<span class="built_in">format</span>(*data))</span><br><span class="line"><span class="comment"># 传入dict</span></span><br><span class="line">data = {<span class="string">'name'</span>: <span class="string">'小明'</span>, <span class="string">'age'</span>: <span class="number">12</span>}</span><br><span class="line"><span class="built_in">print</span>(<span class="string">'我的名字是{name},我今年{age}岁了。'</span>.<span class="built_in">format</span>(**data))</span><br><span class="line"><span class="comment"># 混用</span></span><br><span class="line">data_1 = [<span class="string">'hello'</span>, <span class="string">'world'</span>]</span><br><span class="line">data_2 = {<span class="string">'name'</span>: <span class="string">'小明'</span>, <span class="string">'age'</span>: <span class="number">12</span>}</span><br><span class="line"><span class="built_in">print</span>(<span class="string">'{0} {1} 我的名字是{name},我今年{age}岁了,{0}!'</span>.<span class="built_in">format</span>(*data_1, **data_2))</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/20/python%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95/image-20220720161659164.png" alt="image-20220720161659164"></p>
+<h3 id="2-4【案例】打印文本进度条"><a href="#2-4【案例】打印文本进度条" class="headerlink" title="2.4【案例】打印文本进度条"></a>2.4【案例】打印文本进度条</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line">length = <span class="number">1000</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, length + <span class="number">1</span>):</span><br><span class="line">    percent = i / length</span><br><span class="line">    bar = <span class="string">'▉'</span> * <span class="built_in">int</span>(i // (length / <span class="number">50</span>))</span><br><span class="line">    time.sleep(<span class="number">0.01</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">'\r进度条：|{:&lt;50}|{:&gt;7.1%}'</span>.<span class="built_in">format</span>(bar, percent), end=<span class="string">''</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">'\n'</span>)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/20/python%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95/image-20220720161726768.png" alt="image-20220720161726768"></p>
+<h3 id="2-5其他格式化方式"><a href="#2-5其他格式化方式" class="headerlink" title="2.5其他格式化方式"></a>2.5其他格式化方式</h3><p><img src="/2022/07/20/python%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95/1585620230582.png" alt="1585620230582"></p>
+<p><img src="/2022/07/20/python%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95/1585620239918.png" alt="1585620239918"></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">height, weight=(<span class="built_in">eval</span>(<span class="built_in">input</span>(<span class="string">"请输入身高（米）和体重（公斤）"</span>)))</span><br><span class="line">bmi=weight/<span class="built_in">pow</span>(height,<span class="number">2</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">"BMI的数值为:{:.2f}"</span>.<span class="built_in">format</span>(bmi))</span><br><span class="line">who,nat=<span class="string">""</span>,<span class="string">""</span></span><br><span class="line"><span class="keyword">if</span> bmi&lt;<span class="number">18.5</span>:</span><br><span class="line">    who,nat=<span class="string">"偏瘦"</span>,<span class="string">"偏瘦"</span></span><br><span class="line"><span class="keyword">elif</span> <span class="number">18.5</span>&lt;=bmi&lt;<span class="number">24</span>:</span><br><span class="line">    who,nat=<span class="string">"正常"</span>,<span class="string">"正常"</span></span><br><span class="line"><span class="keyword">elif</span> <span class="number">24</span>&lt;=bmi&lt;<span class="number">25</span>:</span><br><span class="line">    who,nat=<span class="string">"正常"</span>,<span class="string">"偏胖"</span></span><br><span class="line"><span class="keyword">elif</span> <span class="number">25</span>&lt;=bmi&lt;<span class="number">28</span>:</span><br><span class="line">    who,nat=<span class="string">"偏胖"</span>,<span class="string">"偏胖"</span></span><br><span class="line"><span class="keyword">elif</span> <span class="number">28</span>&lt;=bmi&lt;<span class="number">30</span>:</span><br><span class="line">    who,nat=<span class="string">"偏胖"</span>,<span class="string">"肥胖"</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    who, nat = <span class="string">"肥胖"</span>, <span class="string">"肥胖"</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">"BMI指标为：国际'{0}'，国内'{1}'"</span>.<span class="built_in">format</span>(who,nat))</span><br></pre></td></tr></tbody></table></figure>
+<h2 id="3-turtle绘图"><a href="#3-turtle绘图" class="headerlink" title="3.turtle绘图"></a>3.turtle绘图</h2><p>1.库library 包package 模块module库引用：import from…import  import…as</p>
+<p>2.最小单位是像素，电脑左上角坐标为(0.0)</p>
+<h3 id="3-1turtle函数"><a href="#3-1turtle函数" class="headerlink" title="3.1turtle函数"></a>3.1turtle函数</h3><ul>
+<li><code>turtle.setup(width,height,startx,starty)</code></li>
+<li><code>turtle.goto(x,y)</code>可以直接到达某一坐标</li>
+<li><code>turtle.fd</code> 向前走</li>
+<li><code>turtle.seth(angle)</code>调整角度</li>
+<li><code>turtle.penup()</code>表示画笔抬起</li>
+<li><code>turtle.pensize()=turtle.width</code>表示画笔宽度</li>
+<li><code>turtle.pencolor()</code>表示画笔颜色：颜色字符串，RGB小数值，RGB元组</li>
+<li><code>turtle.forward(d)</code>d表示行进距离</li>
+<li><code>turtle.circle(r,extent=None)</code>根据半径r绘制extent角度的弧形，默认圆心在海龟的左侧</li>
+<li><code>turtle.seth()</code>方向控制函数：绝对坐标系的转向</li>
+<li><code>turtle.left(angle)</code>海龟向左转turtle.right(angle)海龟向右转：海龟角度</li>
+</ul>
+<h3 id="3-2【案例】python绘制python蟒蛇"><a href="#3-2【案例】python绘制python蟒蛇" class="headerlink" title="3.2【案例】python绘制python蟒蛇"></a>3.2【案例】python绘制python蟒蛇</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> turtle<span class="comment">#引入turtle库</span></span><br><span class="line">turtle.setup(<span class="number">650</span>,<span class="number">350</span>,<span class="number">200</span>,<span class="number">200</span>)</span><br><span class="line">turtle.penup()</span><br><span class="line">turtle.fd(-<span class="number">250</span>)</span><br><span class="line">turtle.pendown()</span><br><span class="line">turtle.pensize(<span class="number">25</span>)</span><br><span class="line">turtle.pencolor(<span class="string">"purple"</span>)</span><br><span class="line">turtle.seth(-<span class="number">40</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">    turtle.circle(<span class="number">40</span>,<span class="number">80</span>)</span><br><span class="line">    turtle.circle(-<span class="number">40</span>,<span class="number">80</span>)</span><br><span class="line">turtle.circle(<span class="number">40</span>,<span class="number">80</span>/<span class="number">2</span>)</span><br><span class="line">turtle.fd(<span class="number">40</span>)</span><br><span class="line">turtle.circle(<span class="number">16</span>,<span class="number">180</span>)</span><br><span class="line">turtle.fd(<span class="number">40</span>*<span class="number">2</span>/<span class="number">3</span>)</span><br><span class="line">turtle.done()</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/20/python%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95/image-20220720162009133.png" alt="image-20220720162009133"></p>
+<h2 id="4-bool运算"><a href="#4-bool运算" class="headerlink" title="4.bool运算"></a>4.bool运算</h2><h3 id="4-1bool-返回为假的情况"><a href="#4-1bool-返回为假的情况" class="headerlink" title="4.1bool( )返回为假的情况"></a>4.1bool( )返回为假的情况</h3><ul>
+<li>x为<code>0,0.0,0+0j，False，None，''</code></li>
+<li><code>[]</code>空列表</li>
+<li><code>{}</code>空字典</li>
+<li><code>set()</code>空集合</li>
+<li><code>()</code>空元组</li>
+</ul>
+<h3 id="4-2条件表达式"><a href="#4-2条件表达式" class="headerlink" title="4.2条件表达式"></a>4.2条件表达式</h3><p>语法：<code>表达式1 if 真值表达式 else 表达式2</code></p>
+<p>作用：如果真值表达式的布尔环境值为True，则执行表达式1并返回结果的引用，否则执行表达式2并返回结果的引用</p>
+<p><img src="/2022/07/20/python%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95/image-20220720162324973.png" alt="image-20220720162324973"></p>
+<h3 id="4-3pass语句"><a href="#4-3pass语句" class="headerlink" title="4.3pass语句"></a>4.3pass语句</h3><ul>
+<li>作用：通常用来填充语法空白</li>
+<li>pass语句又名空语句</li>
+</ul>
+<h3 id="4-4isinstance-函数判断"><a href="#4-4isinstance-函数判断" class="headerlink" title="4.4isinstance()函数判断"></a>4.4isinstance()函数判断</h3><p><code>isinstance(object, classinfo)</code></p>
+<ul>
+<li><code>object</code>— 实例对象。</li>
+<li><code>classinfo</code>— 可以是直接或间接类名、基本类型或者由它们组成的元组。</li>
+</ul>
+<p><strong>返回值</strong></p>
+<p>如果对象的类型与参数二的类型（classinfo）相同则返回 True，否则返回 False</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">A</span>:</span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span>(<span class="title class_ inherited__">A</span>):</span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">isinstance</span>(A(), A))    <span class="comment"># returns True</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">type</span>(A()) == A)        <span class="comment"># returns True</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">isinstance</span>(B(), A))    <span class="comment"># returns True</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">type</span>(B()) == A)        <span class="comment"># returns False</span></span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/20/python%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95/image-20220720162614817.png" alt="image-20220720162614817"></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E7%BC%96%E7%A8%8B/">🏷️编程</a>
+                    
+                        <a href="/tags/python/">🏷️python</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2022/07/20/python%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85/">python库文件安装</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 尹祺翔 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
