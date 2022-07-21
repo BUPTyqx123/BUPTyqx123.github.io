@@ -257,13 +257,13 @@
                     
                         <span class="post-count">
                             📑字数:
-                        <a href="">3,669</a><br>  
+                        <a href="">4,062</a><br>  
                         </span>
                     
                     
                         <span class="post-count">
                     ⏰预计阅读时间:
-                        <a href="">15min</a>  
+                        <a href="">17min</a>  
                         </span>
                     
                 </div>
@@ -271,7 +271,7 @@
         </header>
 
         <div class="post-content">
-            <h2 id="1-列表list"><a href="#1-列表list" class="headerlink" title="1.列表list"></a>1.列表list</h2><h3 id="1-1列表生成"><a href="#1-1列表生成" class="headerlink" title="1.1列表生成"></a>1.1列表生成</h3><p>列表是由一系列特定元素组成的，元素和元素之间没有任何关系，但他们之间有先后顺序的关系</p>
+            <h2 id="1-列表list"><a href="#1-列表list" class="headerlink" title="1.列表list"></a>1.列表list</h2><h3 id="1-1-列表生成"><a href="#1-1-列表生成" class="headerlink" title="1.1 列表生成"></a>1.1 列表生成</h3><p>列表是由一系列特定元素组成的，元素和元素之间没有任何关系，但他们之间有先后顺序的关系</p>
 <p>列表是一种容器—列表是序列的一种—列表是可以被改变的序列</p>
 <ul>
 <li>创建空列表的字面值：</li>
@@ -293,7 +293,7 @@
 </ul>
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = [<span class="number">1</span>,<span class="number">1</span>,<span class="literal">None</span>,<span class="number">1</span>,[<span class="number">1</span>,<span class="number">2</span>],<span class="string">'sda'</span>,<span class="number">4</span>,<span class="built_in">print</span>]</span><br><span class="line">a[<span class="number">7</span>](<span class="string">'q123'</span>)<span class="comment"># 列表中可以包含关键字</span></span><br><span class="line"><span class="comment">#执行了打印语句</span></span><br></pre></td></tr></tbody></table></figure>
 <p><img src="/2022/07/20/python%E5%AE%B9%E5%99%A8/image-20220720163446179.png" alt="image-20220720163446179"></p>
-<h3 id="1-2列表的运算"><a href="#1-2列表的运算" class="headerlink" title="1.2列表的运算"></a>1.2列表的运算</h3><ul>
+<h3 id="1-2-列表的运算"><a href="#1-2-列表的运算" class="headerlink" title="1.2 列表的运算"></a>1.2 列表的运算</h3><ul>
 <li>算术运算：<ul>
 <li><code>+</code>用于拼接列表</li>
 <li><code>+=</code>用于原列表左侧可迭代对象进行拼接，生成新的列表</li>
@@ -346,7 +346,7 @@
 </ul>
 </li>
 </ul>
-<h3 id="1-3列表函数"><a href="#1-3列表函数" class="headerlink" title="1.3列表函数"></a>1.3列表函数</h3><p>常用的序列函数：</p>
+<h3 id="1-3-列表函数"><a href="#1-3-列表函数" class="headerlink" title="1.3 列表函数"></a>1.3 列表函数</h3><p>常用的序列函数：</p>
 <ul>
 <li><code>len(x)</code>返回序列长度</li>
 <li><code>max(x)</code>返回序列中最大值元素</li>
@@ -373,7 +373,7 @@
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">s.split(sep=<span class="literal">None</span>)</span><br><span class="line"><span class="comment">#将字符串，使用sep作用为分隔符分隔S字符串，返回分割后的字符串的列表，当不给定参数时，用空白字符作为分隔符进行分隔</span></span><br><span class="line">s.join(iterable)</span><br><span class="line"><span class="comment">#用可迭代对象中的字符串，返回一个中间用s分隔的字符串</span></span><br></pre></td></tr></tbody></table></figure>
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(<span class="string">'1 2 3 4 5 6 7\n8\t9'</span>.split(<span class="string">' '</span>))</span><br><span class="line"><span class="built_in">print</span>(<span class="string">' '</span>.join([<span class="string">'1'</span>,<span class="string">'2'</span>,<span class="string">'3'</span>,<span class="string">' '</span>,<span class="string">'4'</span>,<span class="string">'5'</span>,<span class="string">'6'</span>,<span class="string">'7\t8\n9'</span>]))</span><br></pre></td></tr></tbody></table></figure>
 <p><img src="/2022/07/20/python%E5%AE%B9%E5%99%A8/image-20220720165552896.png" alt="image-20220720165552896"></p>
-<h3 id="1-4深浅拷贝"><a href="#1-4深浅拷贝" class="headerlink" title="1.4深浅拷贝"></a>1.4深浅拷贝</h3><p>深拷贝（deep copy）和浅拷贝（shallow copy）：</p>
+<h3 id="1-4-深浅拷贝"><a href="#1-4-深浅拷贝" class="headerlink" title="1.4 深浅拷贝"></a>1.4 深浅拷贝</h3><p>深拷贝（deep copy）和浅拷贝（shallow copy）：</p>
 <p><strong>浅拷贝</strong>：是指在赋值过程中只复制一层变量，不会复制深层变量绑定对象的复制过程 </p>
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">L = [<span class="number">3.1</span>,<span class="number">3.2</span>]</span><br><span class="line">L1 = [<span class="number">1</span>,<span class="number">2</span>,L]</span><br><span class="line">L2 = L1.copy()</span><br><span class="line"><span class="built_in">print</span>(L1)</span><br><span class="line">L2[<span class="number">2</span>][<span class="number">0</span>] = <span class="number">3.14</span></span><br><span class="line"><span class="built_in">print</span>(L1)</span><br><span class="line"><span class="built_in">print</span>(L2)</span><br></pre></td></tr></tbody></table></figure>
 <p><img src="/2022/07/20/python%E5%AE%B9%E5%99%A8/image-20220720165622852.png" alt="image-20220720165622852"></p>
@@ -386,7 +386,7 @@
 <p><strong><code>[:]</code>是浅拷贝</strong></p>
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">A = [<span class="string">'apple'</span>]</span><br><span class="line">B = A[:]</span><br><span class="line">B[<span class="number">0</span>] = <span class="string">'banana'</span></span><br><span class="line"><span class="built_in">print</span>(A)</span><br><span class="line"><span class="comment">#[:]是浅拷贝，只拷贝了第一层，修改不会有影响</span></span><br></pre></td></tr></tbody></table></figure>
 <p><img src="/2022/07/20/python%E5%AE%B9%E5%99%A8/image-20220720170131080.png" alt="image-20220720170131080"></p>
-<h3 id="1-5列表推导式"><a href="#1-5列表推导式" class="headerlink" title="1.5列表推导式"></a>1.5列表推导式</h3><p>列表推导式是用可迭代对象依次生成带有多个元素的列表的表达式</p>
+<h3 id="1-5-列表推导式"><a href="#1-5-列表推导式" class="headerlink" title="1.5 列表推导式"></a>1.5 列表推导式</h3><p>列表推导式是用可迭代对象依次生成带有多个元素的列表的表达式</p>
 <p>作用：用简易的方法生成列表</p>
 <p>语法：</p>
 <ul>
@@ -396,9 +396,30 @@
 <p><img src="/2022/07/20/python%E5%AE%B9%E5%99%A8/image-20220720165752801.png" alt="image-20220720165752801"></p>
 <p><strong>列表表达式的嵌套：</strong></p>
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[表达式<span class="number">1</span></span><br><span class="line">   For 变量<span class="number">1</span> <span class="keyword">in</span> 可迭代对象<span class="number">1</span> <span class="keyword">if</span> 真值表达式<span class="number">1</span></span><br><span class="line">   For 变量<span class="number">2</span> <span class="keyword">in</span> 可迭代对象<span class="number">2</span> <span class="keyword">if</span> 真值表达式<span class="number">2</span></span><br><span class="line">   .....</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">a = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]</span><br><span class="line">b = []</span><br><span class="line"><span class="keyword">for</span> e <span class="keyword">in</span> a:</span><br><span class="line">    b.append(e + <span class="number">1</span>)</span><br><span class="line">a = b</span><br><span class="line"><span class="built_in">print</span>(a)</span><br><span class="line"><span class="built_in">print</span>([e + <span class="number">1</span> <span class="keyword">for</span> e <span class="keyword">in</span> a])</span><br></pre></td></tr></tbody></table></figure>
-<p><img src="/2022/07/20/python%E5%AE%B9%E5%99%A8/image-20220720165844660.png" alt="image-20220720165844660"></p>
-<h3 id="1-6列表解包"><a href="#1-6列表解包" class="headerlink" title="1.6列表解包"></a>1.6列表解包</h3><p><strong>将list中每个元素赋值给一个变量</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>([m + n <span class="keyword">for</span> m <span class="keyword">in</span> <span class="string">'ABC'</span> <span class="keyword">for</span> n <span class="keyword">in</span> <span class="string">'XYZ'</span>])</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/20/python%E5%AE%B9%E5%99%A8/image-20220721162115498.png" alt="image-20220721162115498"></p>
+<p><strong>与其他容器混合使用</strong>：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">d = {<span class="string">'x'</span>: <span class="string">'A'</span>, <span class="string">'y'</span>: <span class="string">'B'</span>, <span class="string">'z'</span>: <span class="string">'C'</span> }</span><br><span class="line"><span class="built_in">print</span>([k + <span class="string">'='</span> + v <span class="keyword">for</span> k, v <span class="keyword">in</span> d.items()])</span><br><span class="line">L = [<span class="string">'Hello'</span>, <span class="string">'World'</span>, <span class="string">'IBM'</span>, <span class="string">'Apple'</span>]</span><br><span class="line"><span class="built_in">print</span>([s.lower() <span class="keyword">for</span> s <span class="keyword">in</span> L])</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/20/python%E5%AE%B9%E5%99%A8/image-20220721162250916.png" alt="image-20220721162250916"></p>
+<p><strong>与if-else语句嵌套使用</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>([x <span class="keyword">if</span> x % <span class="number">2</span> == <span class="number">0</span> <span class="keyword">else</span> -x <span class="keyword">for</span> x <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, <span class="number">11</span>)])</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/20/python%E5%AE%B9%E5%99%A8/image-20220721162425804.png" alt="image-20220721162425804"></p>
+<h3 id="1-6-列表生成器"><a href="#1-6-列表生成器" class="headerlink" title="1.6 列表生成器"></a>1.6 列表生成器</h3><p><img src="/2022/07/20/python%E5%AE%B9%E5%99%A8/image-20220721162702417.png" alt="image-20220721162702417"></p>
+<p>创建<code>L</code>和<code>g</code>的区别仅在于最外层的<code>[]</code>和<code>()</code>，<code>L</code>是一个list，而<code>g</code>是一个generator。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">g = (x * x <span class="keyword">for</span> x <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">2</span>))</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">next</span>(g))</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">next</span>(g))</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">next</span>(g))</span><br></pre></td></tr></tbody></table></figure>
+<p>generator保存的是算法，每次调用<code>next(g)</code>，就计算出<code>g</code>的下一个元素的值，直到计算到最后一个元素，没有更多的元素时，抛出<code>StopIteration</code>的错误。</p>
+<p><img src="/2022/07/20/python%E5%AE%B9%E5%99%A8/image-20220721162859614.png" alt="image-20220721162859614"></p>
+<p>使用for语句调用列表生成器：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">g = (x * x <span class="keyword">for</span> x <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">3</span>))</span><br><span class="line"><span class="keyword">for</span> n <span class="keyword">in</span> g:</span><br><span class="line">    <span class="built_in">print</span>(n)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/20/python%E5%AE%B9%E5%99%A8/image-20220721163203035.png" alt="image-20220721163203035"></p>
+<p>如果一个函数定义中包含<code>yield</code>关键字，那么这个函数就不再是一个普通函数，而是一个generator函数，调用一个generator函数将返回一个generator：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">test</span>():</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">'step 1'</span>)</span><br><span class="line">    <span class="keyword">yield</span> <span class="number">1</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">'step 2'</span>)</span><br><span class="line">    <span class="keyword">yield</span>(<span class="number">3</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">'step 3'</span>)</span><br><span class="line">    <span class="keyword">yield</span>(<span class="number">5</span>)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/20/python%E5%AE%B9%E5%99%A8/image-20220721163435792.png" alt="image-20220721163435792"></p>
+<p><strong>调用generator函数会创建一个generator对象，多次调用generator函数会创建多个相互独立的generator。</strong></p>
+<p><img src="/2022/07/20/python%E5%AE%B9%E5%99%A8/image-20220721163510830.png" alt="image-20220721163510830"></p>
+<p>所以，需要预先定义好generator对象：</p>
+<p><img src="/2022/07/20/python%E5%AE%B9%E5%99%A8/image-20220721163558866.png" alt="image-20220721163558866"></p>
+<h3 id="1-7-列表解包"><a href="#1-7-列表解包" class="headerlink" title="1.7 列表解包"></a>1.7 列表解包</h3><p><strong>将list中每个元素赋值给一个变量</strong></p>
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">name, age, date = [<span class="string">'Bob'</span>, <span class="number">20</span>, <span class="string">'2018-1-1'</span>]</span><br><span class="line"><span class="built_in">print</span>(name)</span><br><span class="line"><span class="built_in">print</span>(age)</span><br><span class="line"><span class="built_in">print</span>(date)</span><br></pre></td></tr></tbody></table></figure>
 <p><img src="/2022/07/20/python%E5%AE%B9%E5%99%A8/image-20220720170329244.png" alt="image-20220720170329244"></p>
 <p><strong>使用<code>*</code></strong>：比如我们要计算平均分，去除最高分和最低分，除了用切片，还可以用解包的方式获得中间的数值。</p>
@@ -410,7 +431,12 @@
 <p><strong><code>_</code>的用法</strong></p>
 <p>当一些元素不用时，用<code>_</code>表示是更好的写法，可以让读代码的人知道这个元素是不要的</p>
 <p><img src="/2022/07/20/python%E5%AE%B9%E5%99%A8/image-20220720170843061.png" alt="image-20220720170843061"></p>
-<h2 id="2-元组tuple"><a href="#2-元组tuple" class="headerlink" title="2.元组tuple"></a>2.元组tuple</h2><h3 id="2-1元组生成"><a href="#2-1元组生成" class="headerlink" title="2.1元组生成"></a>2.1元组生成</h3><ul>
+<h3 id="1-8-列表迭代"><a href="#1-8-列表迭代" class="headerlink" title="1.8 列表迭代"></a>1.8 列表迭代</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections.abc <span class="keyword">import</span> Iterable</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">isinstance</span>(<span class="string">'abc'</span>, Iterable))   <span class="comment"># str是否可迭代</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">isinstance</span>([<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>], Iterable)) <span class="comment"># list是否可迭代</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">isinstance</span>(<span class="number">123</span>, Iterable))     <span class="comment"># 整数是否可迭代</span></span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/20/python%E5%AE%B9%E5%99%A8/image-20220721161926526.png" alt="image-20220721161926526"></p>
+<p>Python内置的<code>enumerate</code>函数可以把一个<code>list</code>变成索引-元素对，这样就可以在<code>for</code>循环中同时迭代索引和元素本身：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i, value <span class="keyword">in</span> <span class="built_in">enumerate</span>([<span class="string">'A'</span>, <span class="string">'B'</span>, <span class="string">'C'</span>]):</span><br><span class="line">    <span class="built_in">print</span>(i, value)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/20/python%E5%AE%B9%E5%99%A8/image-20220721161958054.png" alt="image-20220721161958054"></p>
+<h2 id="2-元组tuple"><a href="#2-元组tuple" class="headerlink" title="2.元组tuple"></a>2.元组tuple</h2><h3 id="2-1-元组生成"><a href="#2-1-元组生成" class="headerlink" title="2.1 元组生成"></a>2.1 元组生成</h3><ul>
 <li>元组是不可改变的序列，同list一样，元组可以存放任意类型的元素，一旦元组生成，则它不可以改变</li>
 <li>元组的表达方式：用小括号<code>( )</code>括起来，单个元素括起来用逗号<code>(,)</code>，区分是单个对象还是元组，创建空元组的字符值<code>t=( )</code></li>
 <li>元组的构造函数 tuple<ul>
@@ -426,7 +452,7 @@
 <li><code>in/in not</code>索引取值/切片取值—规则与列表完全相同</li>
 <li>区别：元组是不可变对象，不支持索引赋值和切片赋值</li>
 </ul>
-<h3 id="2-2元组的方法"><a href="#2-2元组的方法" class="headerlink" title="2.2元组的方法"></a>2.2元组的方法</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">t.index(v[,begin[,end]])</span><br><span class="line"><span class="comment">#用于获取元组中v所在的索引位置</span></span><br><span class="line">t.count(v)</span><br><span class="line"><span class="comment">#用于获取元组中v的个数</span></span><br></pre></td></tr></tbody></table></figure>
+<h3 id="2-2-元组的方法"><a href="#2-2-元组的方法" class="headerlink" title="2.2 元组的方法"></a>2.2 元组的方法</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">t.index(v[,begin[,end]])</span><br><span class="line"><span class="comment">#用于获取元组中v所在的索引位置</span></span><br><span class="line">t.count(v)</span><br><span class="line"><span class="comment">#用于获取元组中v的个数</span></span><br></pre></td></tr></tbody></table></figure>
 <p>可用于序列的函数：<code>len，max，min，sum，all，any</code></p>
 <p><strong>三个构造函数：</strong></p>
 <p><code>str(obj)  list(iterable)   tuple(iterable)</code>用于创建相应的对象</p>
@@ -440,7 +466,7 @@
 <li>字典的键不能重复，而且只能用不可变类型作为字典的键</li>
 </ol>
 <p><strong>字典的字面值表示方式：</strong><code>{ }</code>括起来，以冒号<code>:</code>分隔键值对，各键值对用分号隔开。</p>
-<h3 id="3-1字典的构造"><a href="#3-1字典的构造" class="headerlink" title="3.1字典的构造"></a>3.1字典的构造</h3><p><strong>创建空字典：</strong></p>
+<h3 id="3-1-字典的构造"><a href="#3-1-字典的构造" class="headerlink" title="3.1 字典的构造"></a>3.1 字典的构造</h3><p><strong>创建空字典：</strong></p>
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">d={ }</span><br></pre></td></tr></tbody></table></figure>
 <p><strong>创建非空的字典：</strong></p>
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">d = {<span class="string">'name'</span>:<span class="string">'tarena'</span>;<span class="string">'age'</span>:<span class="number">15</span>}</span><br><span class="line">d = {<span class="string">'姓名'</span>:<span class="string">'小张'</span>}</span><br><span class="line">d = {<span class="number">1</span>:<span class="string">'壹'</span>,<span class="number">2</span>:<span class="string">'贰'</span>}</span><br></pre></td></tr></tbody></table></figure>
@@ -457,7 +483,7 @@
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">d = <span class="built_in">dict</span>((<span class="string">"AB"</span>,<span class="string">"CD"</span>))</span><br><span class="line"><span class="built_in">print</span>(d)</span><br><span class="line">c = <span class="built_in">dict</span>((<span class="string">"AB"</span>,<span class="string">"CD"</span>,[<span class="number">1</span>,<span class="number">2</span>],(<span class="number">3</span>,<span class="number">4</span>)))</span><br><span class="line"><span class="built_in">print</span>(c)</span><br></pre></td></tr></tbody></table></figure>
 <p><img src="/2022/07/20/python%E5%AE%B9%E5%99%A8/image-20220720171621028.png" alt="image-20220720171621028"></p>
 <p>字典的键是不可变类型：int float complex bool str tuple frozenset(字节串) bytes(字节串)</p>
-<h3 id="3-2字典的基本操作"><a href="#3-2字典的基本操作" class="headerlink" title="3.2字典的基本操作"></a>3.2字典的基本操作</h3><p>1）用<code>[]</code>运算符可以获取字典内的’键’对应的’值’</p>
+<h3 id="3-2-字典的基本操作"><a href="#3-2-字典的基本操作" class="headerlink" title="3.2 字典的基本操作"></a>3.2 字典的基本操作</h3><p>1）用<code>[]</code>运算符可以获取字典内的’键’对应的’值’</p>
 <p>  语法： <code>字典[键]</code></p>
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">d = {<span class="string">'first'</span>:<span class="number">123</span>, <span class="string">'second'</span>:<span class="number">456</span>}</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f"My address is <span class="subst">{d[<span class="string">'first'</span>]}</span>"</span>)</span><br><span class="line"><span class="comment"># 此处需要对引号进行转义</span></span><br></pre></td></tr></tbody></table></figure>
 <p><img src="/2022/07/20/python%E5%AE%B9%E5%99%A8/image-20220720171700056.png" alt="image-20220720171700056"></p>
@@ -490,13 +516,13 @@
 </ul>
 </li>
 </ul>
-<h3 id="4-1集合的运算"><a href="#4-1集合的运算" class="headerlink" title="4.1集合的运算"></a>4.1集合的运算</h3><p>交集，并集，补集，子集，超集</p>
+<h3 id="4-1-集合的运算"><a href="#4-1-集合的运算" class="headerlink" title="4.1 集合的运算"></a>4.1 集合的运算</h3><p>交集，并集，补集，子集，超集</p>
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&amp;用于生成两个集合的交集</span><br><span class="line">|用于生成两个集合的并集</span><br><span class="line">-用于生成两个集合的补集s1-s2生成属于s1不属于s2的集合</span><br><span class="line">^用于生成两个集合的对称补集s3=s1^s2等价于s3=(s1-s2)|(s2-s1)</span><br><span class="line">&lt;判断一个集合是两一个集合子集</span><br><span class="line">&gt;判断一个集合是另一个集合的超集</span><br><span class="line">==判断集合相同</span><br><span class="line">!=判断集合不同</span><br><span class="line"><span class="keyword">in</span>判断是否存在于集合中</span><br><span class="line">可用于集合中的函数：<span class="built_in">len</span>(x),<span class="built_in">max</span>(x),<span class="built_in">sum</span>(x),<span class="built_in">any</span>(x),<span class="built_in">all</span>(x)</span><br></pre></td></tr></tbody></table></figure>
-<h3 id="4-2集合的处理方法"><a href="#4-2集合的处理方法" class="headerlink" title="4.2集合的处理方法"></a>4.2集合的处理方法</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">s.add(e)向集合中添加一个新元素e，如果元素已经存在，则不添加</span><br><span class="line">s.add(x)如果x不在s中，把x增加到s中</span><br><span class="line">s.discard(x)移除s中的元素x，如果x不在集合s中，不报错</span><br><span class="line">s.remove(x)移除s中的元素x，如果x不在集合中，会出现keyerror 的报错</span><br><span class="line">s.clear()移除s中所有的元素</span><br><span class="line">s.pop()随机返回s中的一个元素，更新s，若s为空则返回keyerror的报错</span><br><span class="line">s.copy()返回集合s的一个副本</span><br><span class="line">s.pop()删除集合中的随机元素，如果集合为空，返回keyerror 的报错</span><br><span class="line">s.update(s2)用s和s2的全集更新变量s</span><br><span class="line">s.difference(s2)返回存在于s，不存在于s2中的元素</span><br><span class="line">s.isdisjoint(s2)如果s和s2的交集为空返回true，否则返回false</span><br><span class="line">s.issubset(s2)如果s和s2交集非空返回true，否则返回false</span><br></pre></td></tr></tbody></table></figure>
-<h3 id="4-3集合推导式"><a href="#4-3集合推导式" class="headerlink" title="4.3集合推导式"></a>4.3集合推导式</h3><p>用可迭代对象来创建(生成)集合表达式</p>
+<h3 id="4-2-集合的处理方法"><a href="#4-2-集合的处理方法" class="headerlink" title="4.2 集合的处理方法"></a>4.2 集合的处理方法</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">s.add(e)向集合中添加一个新元素e，如果元素已经存在，则不添加</span><br><span class="line">s.add(x)如果x不在s中，把x增加到s中</span><br><span class="line">s.discard(x)移除s中的元素x，如果x不在集合s中，不报错</span><br><span class="line">s.remove(x)移除s中的元素x，如果x不在集合中，会出现keyerror 的报错</span><br><span class="line">s.clear()移除s中所有的元素</span><br><span class="line">s.pop()随机返回s中的一个元素，更新s，若s为空则返回keyerror的报错</span><br><span class="line">s.copy()返回集合s的一个副本</span><br><span class="line">s.pop()删除集合中的随机元素，如果集合为空，返回keyerror 的报错</span><br><span class="line">s.update(s2)用s和s2的全集更新变量s</span><br><span class="line">s.difference(s2)返回存在于s，不存在于s2中的元素</span><br><span class="line">s.isdisjoint(s2)如果s和s2的交集为空返回true，否则返回false</span><br><span class="line">s.issubset(s2)如果s和s2交集非空返回true，否则返回false</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="4-3-集合推导式"><a href="#4-3-集合推导式" class="headerlink" title="4.3 集合推导式"></a>4.3 集合推导式</h3><p>用可迭代对象来创建(生成)集合表达式</p>
 <p>语法：</p>
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">{表达式 <span class="keyword">for</span> 变量 <span class="keyword">in</span> 可迭代对象 [<span class="keyword">if</span> 真值表达式]}</span><br></pre></td></tr></tbody></table></figure>
-<h3 id="4-4固定集合"><a href="#4-4固定集合" class="headerlink" title="4.4固定集合"></a>4.4固定集合</h3><p>固定集合：<code>frozenset</code></p>
+<h3 id="4-4-固定集合"><a href="#4-4-固定集合" class="headerlink" title="4.4 固定集合"></a>4.4 固定集合</h3><p>固定集合：<code>frozenset</code></p>
 <p>固定集合是不可变的，无序的，含有唯一元素的集合</p>
 <p>作用：固定集合可以作为字典的键，也可以作为集合的值</p>
 <p>1）创建空的固定集合 <code>fs=frozenset()</code></p>
@@ -505,6 +531,7 @@
 <p>【案例制作】</p>
 <p>小练习：模拟一个点名系统，已知全班同学的名单，随机打印学生的名字，点名结束后打印未到名单</p>
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">names=[<span class="string">'tom'</span>,<span class="string">'Jerry'</span>,<span class="string">'spike'</span>,<span class="string">'tyke'</span>]</span><br><span class="line">s=<span class="built_in">set</span>(names)<span class="comment">#生成集合，乱序</span></span><br><span class="line">l=[]<span class="comment">#代表未到的人的列表</span></span><br><span class="line"><span class="keyword">for</span> n <span class="keyword">in</span> s:</span><br><span class="line">    info=n+<span class="string">"已到？(y):"</span></span><br><span class="line">    r=<span class="built_in">input</span>(info)</span><br><span class="line">    <span class="keyword">if</span> r!=<span class="string">'y'</span>:</span><br><span class="line">         l.append(n)<span class="comment">#使用append函数可以在列表最后增加一个元素</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">"未到名单如下："</span>)</span><br><span class="line"><span class="keyword">for</span> n <span class="keyword">in</span> l:</span><br><span class="line">    <span class="built_in">print</span>(n,end=<span class="string">' '</span>)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/20/python%E5%AE%B9%E5%99%A8/image-20220720172749209.png" alt="image-20220720172749209"></p>
 
         </div>
 
@@ -537,6 +564,8 @@
             </div>
         </section>
         <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2022/07/20/python%E5%87%BD%E6%95%B0%E4%B8%8E%E8%AF%AD%E5%8F%A5/">python函数与语句</a>
             
             
             <a class="next" rel="next" href="/2022/07/20/python%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95/">python基本操作</a>
