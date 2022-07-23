@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="尹祺翔">
+
+
+
+
+
+<title>NLP基础工具 | yqxBlog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+            <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.2">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">BUPTyqx&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">BUPTyqx&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">NLP基础工具</h1>
+            
+                <div class="post-meta">
+                    
+                        🦹‍♀️作者: <a itemprop="author" rel="author" href="/">尹祺翔</a><br>
+                    
+
+                    
+                        <span class="post-time">
+                        ⏲️时间: <a href="#">July 23, 2022&nbsp;&nbsp;12:12:08</a><br>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                            📒目录:
+                            
+                                <a href="/categories/2022%E5%B9%B4%E6%9A%91%E6%9C%9FPBL%E7%AC%94%E8%AE%B0/">2022年暑期PBL笔记</a><br>
+                            
+                                <a href="/categories/2022%E5%B9%B4%E6%9A%91%E6%9C%9FPBL%E7%AC%94%E8%AE%B0/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86/">自然语言处理</a><br>
+                            
+                        </span>
+                    
+                    
+                    
+                        <span class="post-count">
+                            📑字数:
+                        <a href="">905</a><br>  
+                        </span>
+                    
+                    
+                        <span class="post-count">
+                    ⏰预计阅读时间:
+                        <a href="">5min</a>  
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="1-Common-NLP-Techniques"><a href="#1-Common-NLP-Techniques" class="headerlink" title="1.Common NLP Techniques"></a>1.Common NLP Techniques</h2><div class="table-container">
+<table>
+<thead>
+<tr>
+<th>NLP Technique</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tokenization(word segmentation)</td>
+<td>Convert raw text into separate words or tokens. Word boundaries and punctuations vary across natural languages and therefore it can be a non-trivial task</td>
+</tr>
+<tr>
+<td>Parsing &amp; Tagging</td>
+<td>Parsing is about creating a tree like structure with words, focusing on relationships between them. Tagging is attaching additional info with tokens</td>
+</tr>
+<tr>
+<td>Stemming（词干提取）</td>
+<td>Reducing words into their base form using rules.</td>
+</tr>
+<tr>
+<td>Lemmatization(词形还原)</td>
+<td>Reducing words into their base dictionary form (called as lemma)</td>
+</tr>
+<tr>
+<td>Stop Word Filtering（过滤停用词）</td>
+<td>Removing common,trivial words to reduce clutter and analyze.</td>
+</tr>
+<tr>
+<td>Parts of Speech Tagging（词性标注）</td>
+<td>Determining parts of speech for each work,and tag them accordingly</td>
+</tr>
+<tr>
+<td>Named Entity Recognition（命名实体识别）</td>
+<td>Determining proper names in the text, i.e., names of people, places.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="1-1-Tokenization"><a href="#1-1-Tokenization" class="headerlink" title="1.1 Tokenization"></a>1.1 Tokenization</h3><p>Tokenization is about breaking text into components (tokens)</p>
+<ul>
+<li>Tokenization uses prefix, suffix and infix characters, and punctuation rules to split text into tokens.</li>
+<li>Tokens are pieces of original text. No transformation performed.</li>
+<li>Tokens form building blocks of a <strong>“Doc” object</strong></li>
+<li>Tokens have a variety of useful attributes and methods</li>
+</ul>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220723122015779.png" alt="image-20220723122015779"></p>
+<h3 id="1-2-Stemming"><a href="#1-2-Stemming" class="headerlink" title="1.2 Stemming"></a>1.2 Stemming</h3><ul>
+<li>Technique of reducing words into their base form by applying rules. The rules can be crude such as chopping of letters from end until the <strong>stem</strong> is achieved, or bit more sophisticated</li>
+<li>For examples words like boat, boater, boating may reduce to the same stem, which will help if you are looking for certain words </li>
+<li>One of the most common -and effective -stemming tools is Porter’s Algorithm developed by Martin Porter in 1980</li>
+<li>The algorithm employs five phases of word reduction, each with its own set of mapping rules</li>
+</ul>
+<p><strong>In the first phase, simple suffix mapping rules are defined, such as</strong>（在第一阶段，定义简单的后缀映射规则）</p>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220723122800290.png" alt="image-20220723122800290"></p>
+<p><strong>From a given set of stemming rules only one rule is applied, based on the longest suffix S1.</strong>（从一组给定的词干规则中，仅应用一个规则，基于最长的后缀 S1。）</p>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220723122930964.png" alt="image-20220723122930964"></p>
+<p>More sophisticated phases consider the length/complexity of the word before applying a rule. For example:</p>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220723123129742.png" alt="image-20220723123129742"></p>
+<ul>
+<li><strong>Snowball</strong> is the name of a stemming language also developed by Martin Porter.（这种算法也称为 Porter2 词干算法。它几乎被普遍认为比 Porter 更好，甚至发明 Porter 的开发者也这么认为。Snowball 在 Porter 的基础上加了很多优化。Snowball 与 Porter 相比差异约为5％。）</li>
+<li>The algorithm used here is more accurately called the “English Stemmer” or “Porter2 Stemmer”.</li>
+<li>It offers a slight improvement over the original Porter stemmer, both in logic and speed</li>
+</ul>
+<h3 id="1-3-Lemmatization"><a href="#1-3-Lemmatization" class="headerlink" title="1.3 Lemmatization"></a>1.3 Lemmatization</h3><ul>
+<li>In contrast to stemming, lemmatization looks beyond word reduction, and considers a language’s full vocabulary to apply a morphological analysis to words.</li>
+<li>The lemma of <em>‘was’</em> is <em>‘be’</em> and the lemma of <em>‘mice’</em> is <em>‘mouse’</em>. Further, the lemma of ‘meeting’ might be ‘meet’ or ‘meeting’ depending on its use in a sentence</li>
+<li>Lemmatization is typically seen as much more informative than simple stemming</li>
+<li>Some libraries such as Spacy have opted to support only lemmatization and do not support stemming techniques</li>
+<li>Lemmatization looks at surrounding text to determine a given word’s part of speech, it does not categorize phrases</li>
+</ul>
+<h3 id="1-4-Stop-Word-Filtering"><a href="#1-4-Stop-Word-Filtering" class="headerlink" title="1.4 Stop Word Filtering"></a>1.4 Stop Word Filtering</h3><ul>
+<li>Words like “a” and “the” appear so frequently that they don’t require tagging as thoroughly as nouns, verbs and modifiers</li>
+<li>We call these stop words, and they can be filtered from the text to be processed.</li>
+<li>NLP libraries typically hold a list of stop words. For example,Spacy holds a built-in list of some 305 English stop words</li>
+</ul>
+<h3 id="1-5-Parts-of-Speech-Tagging"><a href="#1-5-Parts-of-Speech-Tagging" class="headerlink" title="1.5 Parts of Speech Tagging"></a>1.5 Parts of Speech Tagging</h3><ul>
+<li>Parts of Speech tagging is a technique of using linguistic knowledge to add useful information to tokens (words)</li>
+<li>For example, in English, Parts of Speech mean categorizing tokens as noun, verb, adjective, etc. Most NLP libraries have additional tags such as plural noun, past tense of a verb etc.</li>
+<li>The premise is that the same word in a different order may mean something completely different</li>
+</ul>
+<h3 id="1-6-Named-Entity-Recognition"><a href="#1-6-Named-Entity-Recognition" class="headerlink" title="1.6 Named Entity Recognition"></a>1.6 Named Entity Recognition</h3><ul>
+<li>Named entities are real-world objects (e.g. persons, organizations, cities and countries, etc.) that can be given proper names</li>
+<li>Named-entity recognition (NER) seeks to locate and classify named entities in unstructured text into pre-defined categories such as the person names, organizations, locations, medical codes, time expressions, quantities, monetary values, percentages, etc. </li>
+<li>NER helps to extract <strong>main entities</strong> in a text, and detect important information, which is crucial if you are dealing with large dataset.</li>
+</ul>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220723130626663.png" alt="image-20220723130626663"></p>
+<h2 id="2-Introduction-to-NLTK-and-Spacy"><a href="#2-Introduction-to-NLTK-and-Spacy" class="headerlink" title="2.Introduction to NLTK and Spacy"></a>2.Introduction to NLTK and Spacy</h2><h3 id="2-1-NLTK"><a href="#2-1-NLTK" class="headerlink" title="2.1 NLTK"></a>2.1 NLTK</h3><ul>
+<li>NLTK-Natural Language Toolkit is a very popular open source.</li>
+<li>Initially released in 2001, it is much older than Spacy (released 2015) Created essentially for teaching and research</li>
+<li>It also provides many functionalities, but includes less efficient implementations.</li>
+</ul>
+<h3 id="2-2-Spacy"><a href="#2-2-Spacy" class="headerlink" title="2.2 Spacy"></a>2.2 Spacy</h3><ul>
+<li>Open Source Natural Language Processing Library. </li>
+<li>Designed to effectively handle NLP tasks with the most efficient implementation of common algorithms</li>
+<li>Designed to get things done </li>
+<li>For many NLP tasks, Spacy only has one implemented method, choosing the most efficient algorithm currently available. </li>
+<li>This means you often don’t have the option to choose other algorithms.</li>
+<li>It is an optionated software!</li>
+</ul>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E7%BC%96%E7%A8%8B/">🏷️编程</a>
+                    
+                        <a href="/tags/python/">🏷️python</a>
+                    
+                        <a href="/tags/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86/">🏷️自然语言处理</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2022/07/20/python%E5%87%BD%E6%95%B0%E4%B8%8E%E8%AF%AD%E5%8F%A5/">python函数与语句</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 尹祺翔 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
