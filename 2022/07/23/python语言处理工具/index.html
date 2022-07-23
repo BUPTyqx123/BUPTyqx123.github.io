@@ -259,13 +259,13 @@
                     
                         <span class="post-count">
                             📑字数:
-                        <a href="">905</a><br>  
+                        <a href="">1,014</a><br>  
                         </span>
                     
                     
                         <span class="post-count">
                     ⏰预计阅读时间:
-                        <a href="">5min</a>  
+                        <a href="">6min</a>  
                         </span>
                     
                 </div>
@@ -373,6 +373,25 @@
 <li>For many NLP tasks, Spacy only has one implemented method, choosing the most efficient algorithm currently available. </li>
 <li>This means you often don’t have the option to choose other algorithms.</li>
 <li>It is an optionated software!</li>
+<li>For many common NLP tasks, Spacy is much faster and more efficient, at the cost of the user not being able to choose algorithmic implementations. </li>
+<li>However,Spacy does not include pre-created models for some applications, such as sentiment analysis, which is typically easier to perform with NLTK.</li>
+</ul>
+<p><strong>NLTK VS Spacy</strong>（processing tests）</p>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220723131521938.png" alt="image-20220723131521938"></p>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220723131625158.png" alt="image-20220723131625158"></p>
+<p><strong>Spacy works with a pipeline object</strong></p>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220723131848369.png" alt="image-20220723131848369"></p>
+<ul>
+<li>The <code>nlp()</code> function from Spacy automatically takes raw text and performs a series of operations to tag, parse, and describe the text </li>
+</ul>
+<p>installing Spacy：</p>
+<ul>
+<li><p>Download Spacy</p>
+<figure class="highlight cmd"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install Spacy -i https://pypi.doubanio.com/simple</span><br></pre></td></tr></tbody></table></figure>
+</li>
+<li><p>Download English language library and link with Spacy</p>
+<figure class="highlight cmd"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -m spacy download en</span><br></pre></td></tr></tbody></table></figure>
+</li>
 </ul>
 
         </div>
