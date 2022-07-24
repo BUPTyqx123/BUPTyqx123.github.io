@@ -259,13 +259,13 @@
                     
                         <span class="post-count">
                             📑字数:
-                        <a href="">1,014</a><br>  
+                        <a href="">2,065</a><br>  
                         </span>
                     
                     
                         <span class="post-count">
                     ⏰预计阅读时间:
-                        <a href="">6min</a>  
+                        <a href="">11min</a>  
                         </span>
                     
                 </div>
@@ -320,7 +320,7 @@
 <li>Tokens form building blocks of a <strong>“Doc” object</strong></li>
 <li>Tokens have a variety of useful attributes and methods</li>
 </ul>
-<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220723122015779.png" alt="image-20220723122015779"></p>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/tokenization-9b27c0f6fe98dcb26239eba4d3ba1f3d.svg" alt="tokenization-9b27c0f6fe98dcb26239eba4d3ba1f3d"></p>
 <h3 id="1-2-Stemming"><a href="#1-2-Stemming" class="headerlink" title="1.2 Stemming"></a>1.2 Stemming</h3><ul>
 <li>Technique of reducing words into their base form by applying rules. The rules can be crude such as chopping of letters from end until the <strong>stem</strong> is achieved, or bit more sophisticated</li>
 <li>For examples words like boat, boater, boating may reduce to the same stem, which will help if you are looking for certain words </li>
@@ -389,10 +389,115 @@
 <li><p>Download Spacy</p>
 <figure class="highlight cmd"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install Spacy -i https://pypi.doubanio.com/simple</span><br></pre></td></tr></tbody></table></figure>
 </li>
-<li><p>Download English language library and link with Spacy</p>
+<li><p>Download English language library and link with Spacy（这条指令貌似执行下载的结果也是<code>spacy-model en_core_web_sm</code>包，可以使用下面的指令安装）</p>
 <figure class="highlight cmd"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -m spacy download en</span><br></pre></td></tr></tbody></table></figure>
 </li>
 </ul>
+<ul>
+<li><blockquote>
+<p>或者在管理员模式下，调整anaconda源，并使用anaconda中已经集成了spacy的英文model</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/</span><br><span class="line">conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/</span><br><span class="line">conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/</span><br><span class="line">conda config --set show_channel_urls yes</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">conda install -c conda-forge spacy-model-en_core_web_sm</span><br><span class="line">conda install -c conda-forge spacy-model-en_core_web_md</span><br><span class="line">conda install -c conda-forge spacy-model-en_core_web_lg</span><br></pre></td></tr></tbody></table></figure>
+</blockquote>
+</li>
+</ul>
+<h2 id="3-Spacy"><a href="#3-Spacy" class="headerlink" title="3.Spacy"></a>3.Spacy</h2><h3 id="3-1-Introduction"><a href="#3-1-Introduction" class="headerlink" title="3.1 Introduction"></a>3.1 Introduction</h3><blockquote>
+<p>此处有一些额外的参考：</p>
+<ul>
+<li>spacy官方网站：<code>https://spacy.io/usage</code></li>
+<li><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725013503799.png" alt="image-20220725013503799"></li>
+</ul>
+</blockquote>
+<p>导入<code>spacy</code>包，并导入一个en的模型</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> spacy</span><br><span class="line">nlp = spacy.load(<span class="string">'en_core_web_sm'</span>) <span class="comment">#导入一个en的模型</span></span><br></pre></td></tr></tbody></table></figure>
+<p>将一句话导入<code>nlp()</code>的模型：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">doc = nlp(<span class="string">u'Apple is looking at buy a U.K. startup for $10 Billion'</span>)  <span class="comment">#u表示unicode string</span></span><br><span class="line"><span class="built_in">type</span>(doc)  <span class="comment">#将此字符串拆分为token</span></span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725001718753.png" alt="image-20220725001718753"></p>
+<ul>
+<li>doc object has tokens </li>
+<li>原始句子有一下几个属性：<ul>
+<li><code>token.pos</code>  词性参考</li>
+<li><code>token.pos_</code> 词性表示</li>
+<li><code>token.dep_</code>给出更多的信息,比如依存关系</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> token <span class="keyword">in</span> doc:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">'%-15s%-15s%-15s%-15s'</span>%(token.text, token.pos, token.pos_, token.dep_))</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725001855887.png" alt="image-20220725001855887"></p>
+<p>查看<code>nlp()</code>管道中包含的属性：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nlp.pipeline  <span class="comment"># 查看管道</span></span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725001914976.png" alt="image-20220725001914976"></p>
+<p>具体的属性说明如下：</p>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725002542229.png" alt="image-20220725002542229"></p>
+<p>再导入一句话，查看处理的结果：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">doc2 = nlp(<span class="string">"Apple isn't looking into buying \</span></span><br><span class="line"><span class="string">			startups in U.K. anymore."</span>)</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(<span class="string">'%-15s%-15s%-15s%-15s'</span>%(<span class="string">'token.text'</span>, <span class="string">'token.pos'</span>, <span class="string">'token.pos_'</span>, <span class="string">'token.dep_'</span>))</span><br><span class="line"><span class="built_in">print</span>(<span class="string">'--------------------------------------------------------'</span>)</span><br><span class="line"><span class="keyword">for</span> token <span class="keyword">in</span> doc2:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">'%-15s%-15s%-15s%-15s'</span>%(token.text, token.pos, token.pos_, token.dep_))</span><br></pre></td></tr></tbody></table></figure>
+<p>可以发现spacy能够区分<code>is</code> 和<code>n't</code>是两部分，同时能够区分<code>U.K.</code>中的<code>.</code>和句号之间的区别：</p>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725002018647.png" alt="image-20220725002018647"></p>
+<p><code>doc</code>对象还可以进行索引，并对索引对象查看属性，同时可以使用<code>spacy.explain</code>进行描述：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(doc2[<span class="number">0</span>], <span class="string">'--'</span>, <span class="built_in">type</span>(doc[<span class="number">0</span>]))            <span class="comment"># 可以进行索引 并查看类型</span></span><br><span class="line"><span class="built_in">print</span>(doc2[<span class="number">0</span>].pos_, doc2[<span class="number">0</span>].dep_)             <span class="comment"># 查看词性和句法分析</span></span><br><span class="line"><span class="built_in">print</span>(spacy.explain(<span class="built_in">str</span>(doc2[<span class="number">0</span>].pos_)))</span><br><span class="line"><span class="built_in">print</span>(spacy.explain(<span class="built_in">str</span>(doc2[<span class="number">0</span>].dep_)))       <span class="comment">#解释对应的词汇</span></span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725002132515.png" alt="image-20220725002132515"></p>
+<ul>
+<li><code>span</code>对象：<code>span</code>对象是<code>doc</code>对象的一个切片</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">doc3 = nlp(<span class="string">u'Although commmonly attributed to John Lennon from \</span></span><br><span class="line"><span class="string">		   his song "Beautiful Boy", the phrase "Life is what \</span></span><br><span class="line"><span class="string">		   happens to us while we are making other plans" was \</span></span><br><span class="line"><span class="string">		   written by  cartoonist Allen Saunders and published \</span></span><br><span class="line"><span class="string">		   in Reader\'s Digest in 1957, when Lennon was 17.'</span>)</span><br></pre></td></tr></tbody></table></figure>
+<p>对这句话中的quote进行切片：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">life_quote = doc3[<span class="number">16</span>:<span class="number">30</span>]</span><br><span class="line"><span class="built_in">print</span>(life_quote)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725002316336.png" alt="image-20220725002316336"></p>
+<p>查看该切片的数据类型，可以发现，为<code>span</code>：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">type</span>(life_quote)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725002348218.png" alt="image-20220725002348218"></p>
+<ul>
+<li><code>doc.sents</code>：将一段话按照句子进行切分：其每一句话均为一个<code>span</code>对象：</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">doc4 = nlp(<span class="string">u'This is first sentence.Hey, second sentence. \</span></span><br><span class="line"><span class="string">		   Third sentence. Fourth sentence. Stupid sentence.'</span>)</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> sentence <span class="keyword">in</span> doc4.sents:</span><br><span class="line">    <span class="built_in">print</span>(sentence ,<span class="built_in">type</span>(sentence)) <span class="comment"># 切分为句子</span></span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725002724800.png" alt="image-20220725002724800"></p>
+<p>同时可以使用<code>doc.is_sent_start</code>判断某个词是否为一句话的开始：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(doc4[<span class="number">0</span>], doc4[<span class="number">0</span>].is_sent_start)  <span class="comment"># 询问是否为一句话的开始</span></span><br><span class="line"><span class="built_in">print</span>(doc4[<span class="number">5</span>], doc4[<span class="number">5</span>].is_sent_start)</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="3-2-Tokenization"><a href="#3-2-Tokenization" class="headerlink" title="3.2 Tokenization"></a>3.2 Tokenization</h3><p>Spacy处理一句话变成为Tokenization的过程：</p>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220723122015779.png" alt="image-20220723122015779"></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> spacy</span><br><span class="line">nlp = spacy.load(<span class="string">'en_core_web_sm'</span>)</span><br></pre></td></tr></tbody></table></figure>
+<ul>
+<li>分割多个引号：</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">doc = nlp(<span class="string">u'"We\'re moving to L.A.!"'</span>)</span><br><span class="line"><span class="keyword">for</span> token <span class="keyword">in</span> doc:</span><br><span class="line">    <span class="built_in">print</span>(token, end = <span class="string">' | '</span>)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725014206009.png" alt="image-20220725014206009"></p>
+<ul>
+<li>分割链接：</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">doc2 = nlp(<span class="string">u"We're here to help! Send snail-mail,\</span></span><br><span class="line"><span class="string">		   emall support@oursite.com or visit us at\</span></span><br><span class="line"><span class="string">           http://www.oursite.com!"</span>)</span><br><span class="line"><span class="keyword">for</span> token <span class="keyword">in</span> doc2:</span><br><span class="line">    <span class="built_in">print</span>(token, end = <span class="string">' | '</span>)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725014240074.png" alt="image-20220725014240074"></p>
+<ul>
+<li>分割特殊符号：</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">doc3 = nlp(<span class="string">u"I paid $50.23 for a used furniture."</span>)</span><br><span class="line"><span class="keyword">for</span> token <span class="keyword">in</span> doc3:</span><br><span class="line">    <span class="built_in">print</span>(token, end = <span class="string">' | '</span>)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725014300346.png" alt="image-20220725014300346"></p>
+<ul>
+<li>分割<code>.</code>号：</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">doc4 = nlp(<span class="string">u"Let's visit St. Louis in U.S. next month"</span>)</span><br><span class="line"><span class="keyword">for</span> token <span class="keyword">in</span> doc4:</span><br><span class="line">    <span class="built_in">print</span>(token, end = <span class="string">' | '</span>)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725014332054.png" alt="image-20220725014332054"></p>
+<p>同时：<code>spacy.tokens.doc.Doc</code>中的对象不支持修改：</p>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725014346835.png" alt="image-20220725014346835"></p>
+<p><strong>Name Entity</strong>：</p>
+<ul>
+<li><code>entity.text</code>：实体内容</li>
+<li><code>entity.label_</code>：实体标签</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">doc8 = nlp(<span class="string">u"Apple is trying to build a new factory in Hong Kong in 2021"</span>)</span><br><span class="line"><span class="keyword">for</span> token <span class="keyword">in</span> doc8:</span><br><span class="line">    <span class="built_in">print</span>(token, end = <span class="string">' | '</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">'\n'</span>)</span><br><span class="line"><span class="comment"># Name Entities</span></span><br><span class="line"><span class="keyword">for</span> entity <span class="keyword">in</span> doc8.ents:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">'%-15s%-15s%-30s'</span>%(entity.text,entity.label_, </span><br><span class="line">                              spacy.explain(<span class="built_in">str</span>(entity.label_))))</span><br></pre></td></tr></tbody></table></figure>
+<p>有三个span对象的name entities，同时可以打印对其所属类别的解释：</p>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725014521268.png" alt="image-20220725014521268"></p>
+<p><strong>Noun Chunks</strong>：名词组块分析，提取名词短语</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">doc9 = nlp(<span class="string">u"Autonomous cars shift insurance \</span></span><br><span class="line"><span class="string">            liability toward manufactures."</span>)</span><br><span class="line"><span class="keyword">for</span> chunk <span class="keyword">in</span> doc9.noun_chunks:</span><br><span class="line">    <span class="built_in">print</span>(chunk.text)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725014551438-16586847533852.png" alt="image-20220725014551438"></p>
+<p><strong>visualization</strong></p>
+<p>依存关系的可视化：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> spacy <span class="keyword">import</span> displacy</span><br><span class="line">displacy.render(doc9, style = <span class="string">'dep'</span>, jupyter = <span class="literal">True</span>, </span><br><span class="line">                options = {<span class="string">'distance'</span>:<span class="number">90</span>})</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725014655913.png" alt="image-20220725014655913"></p>
+<p>Name Entity的可视化：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">doc8 = nlp(<span class="string">u"Apple is trying to build a new factory in \</span></span><br><span class="line"><span class="string">           Hong Kong in 2021"</span>)</span><br><span class="line">displacy.render(doc8, style = <span class="string">'ent'</span>, jupyter = <span class="literal">True</span>)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725014709095.png" alt="image-20220725014709095"></p>
 
         </div>
 
