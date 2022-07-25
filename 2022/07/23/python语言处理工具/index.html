@@ -259,13 +259,13 @@
                     
                         <span class="post-count">
                             📑字数:
-                        <a href="">2,065</a><br>  
+                        <a href="">2,499</a><br>  
                         </span>
                     
                     
                         <span class="post-count">
                     ⏰预计阅读时间:
-                        <a href="">11min</a>  
+                        <a href="">14min</a>  
                         </span>
                     
                 </div>
@@ -313,6 +313,8 @@
 </tbody>
 </table>
 </div>
+<p>一些开源的工具：</p>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725152300585.png" alt="image-20220725152300585"></p>
 <h3 id="1-1-Tokenization"><a href="#1-1-Tokenization" class="headerlink" title="1.1 Tokenization"></a>1.1 Tokenization</h3><p>Tokenization is about breaking text into components (tokens)</p>
 <ul>
 <li>Tokenization uses prefix, suffix and infix characters, and punctuation rules to split text into tokens.</li>
@@ -498,6 +500,58 @@
 <p>Name Entity的可视化：</p>
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">doc8 = nlp(<span class="string">u"Apple is trying to build a new factory in \</span></span><br><span class="line"><span class="string">           Hong Kong in 2021"</span>)</span><br><span class="line">displacy.render(doc8, style = <span class="string">'ent'</span>, jupyter = <span class="literal">True</span>)</span><br></pre></td></tr></tbody></table></figure>
 <p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725014709095.png" alt="image-20220725014709095"></p>
+<h3 id="3-3-Lemmatization"><a href="#3-3-Lemmatization" class="headerlink" title="3.3 Lemmatization"></a>3.3 Lemmatization</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> spacy</span><br><span class="line">nlp = spacy.load(<span class="string">'en_core_web_sm'</span>)</span><br></pre></td></tr></tbody></table></figure>
+<p>使用<code>token.lemma_</code>查看Lemmatization</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">show_lemmas</span>(<span class="params">doc</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">'%-15s%-15s%-15s%-15s%-15s'</span>%(<span class="string">'token.text'</span>, <span class="string">'token.pos'</span>, </span><br><span class="line">                                       <span class="string">'token.pos_'</span>, <span class="string">'token.dep_'</span>, </span><br><span class="line">                                       <span class="string">'token.lemma'</span>))</span><br><span class="line">    <span class="keyword">for</span> token <span class="keyword">in</span> doc:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">'%-15s%-15s%-15s%-15s%-15s'</span>%(token.text, token.pos, </span><br><span class="line">                                           token.pos_, token.dep_, </span><br><span class="line">                                           token.lemma_))</span><br></pre></td></tr></tbody></table></figure>
+<p>测试第一个句子：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">doc = nlp(<span class="string">"I am runner running in a race because \</span></span><br><span class="line"><span class="string">           I love to run and I ran earlier this morning"</span>)</span><br><span class="line">show_lemmas(doc)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725122044343.png" alt="image-20220725122044343"></p>
+<ul>
+<li>不规则的名词复数可以变为原形：</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">doc1 = nlp(<span class="string">u'I saw eighteen mice today'</span>)</span><br><span class="line">show_lemmas(doc1)   </span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725122107682.png" alt="image-20220725122107682"></p>
+<ul>
+<li>系动词会恢复原形：</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">doc2 = nlp(<span class="string">u"That's an apple."</span>)</span><br><span class="line">show_lemmas(doc2)   <span class="comment"># 's--&gt;be</span></span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725122159013.png" alt="image-20220725122159013"></p>
+<ul>
+<li>副词不会恢复原形，因为含义不同：</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">doc4 = nlp(<span class="string">u"That was ridiculously easy and easily done and fairly"</span>)</span><br><span class="line">show_lemmas(doc4)  </span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725122233154.png" alt="image-20220725122233154"></p>
+<h3 id="3-4-stop-words"><a href="#3-4-stop-words" class="headerlink" title="3.4 stop words"></a>3.4 stop words</h3><p><code>nlp.Defaults.stop_words</code>默认的stop words列表</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(nlp.Defaults.stop_words)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725164326466.png" alt="image-20220725164326466"></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nlp.vocab[<span class="string">'whenever'</span>]</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725164352151.png" alt="image-20220725164352151"></p>
+<ul>
+<li>使用<code>is_stop</code>判断是否为停用词</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nlp.vocab[<span class="string">'whenever'</span>].is_stop</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725164437764.png" alt="image-20220725164437764"></p>
+<ul>
+<li>查看有多少个停用词：</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">len</span>(nlp.Defaults.stop_words)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725164507084.png" alt="image-20220725164507084"></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 设置停用词的两种方法：</span></span><br><span class="line">nlp.Defaults.stop_words.add(<span class="string">'btu'</span>)</span><br><span class="line">nlp.vocab[<span class="string">'btw'</span>].is_stop = <span class="literal">True</span></span><br><span class="line"><span class="built_in">print</span>(nlp.vocab[<span class="string">'btu'</span>].is_stop)</span><br><span class="line"><span class="built_in">print</span>(nlp.vocab[<span class="string">'btw'</span>].is_stop)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725164529232.png" alt="image-20220725164529232"></p>
+<h2 id="4-NLTK"><a href="#4-NLTK" class="headerlink" title="4.NLTK"></a>4.NLTK</h2><h3 id="4-1-Stemming"><a href="#4-1-Stemming" class="headerlink" title="4.1 Stemming"></a>4.1 Stemming</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"><span class="keyword">from</span> nltk.stem.porter <span class="keyword">import</span> PorterStemmer</span><br></pre></td></tr></tbody></table></figure>
+<p>创建一个<code>PorterStemmer()</code>对象：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p_stemmer = PorterStemmer()</span><br></pre></td></tr></tbody></table></figure>
+<p>使用port算法，处理列表中的词汇：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">words = [<span class="string">'run'</span>, <span class="string">'runs'</span>, <span class="string">'runner'</span>, <span class="string">'running'</span>, <span class="string">'ran'</span>, <span class="string">'easily'</span>, <span class="string">'fairly'</span>]</span><br><span class="line"><span class="keyword">for</span> word <span class="keyword">in</span> words:</span><br><span class="line">    <span class="built_in">print</span>(word + <span class="string">'----&gt;'</span> + p_stemmer.stem(word))</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725120104043.png" alt="image-20220725120104043"></p>
+<p>可以发现对于<code>easily</code>，<code>fairly</code>等词汇的处理并不智能。</p>
+<p>下面尝试使用snowball算法：创建一个<code>SnowballStemmer()</code>对象：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># snowball stemmer</span></span><br><span class="line"><span class="keyword">from</span> nltk.stem.snowball <span class="keyword">import</span> SnowballStemmer</span><br><span class="line">s_stemmer = SnowballStemmer(language = <span class="string">'english'</span>)</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">words = [<span class="string">'run'</span>, <span class="string">'runs'</span>, <span class="string">'runner'</span>, <span class="string">'running'</span>, <span class="string">'ran'</span>, <span class="string">'easily'</span>, <span class="string">'fairly'</span>]</span><br><span class="line"><span class="keyword">for</span> word <span class="keyword">in</span> words:</span><br><span class="line">    <span class="built_in">print</span>(word + <span class="string">'----&gt;'</span> + s_stemmer.stem(word))</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725120248336.png" alt="image-20220725120248336"></p>
+<p>NLTK中的stemming算法的局限性：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">phrase = <span class="string">'I am meeting Raj at the meeting this afternoon'</span></span><br><span class="line"><span class="keyword">for</span> word <span class="keyword">in</span> phrase.split():</span><br><span class="line">    <span class="built_in">print</span>(word + <span class="string">'-----&gt;'</span> + s_stemmer.stem(word))</span><br><span class="line"><span class="comment"># 无法区分两个meeting</span></span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/07/23/python%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/image-20220725120326292.png" alt="image-20220725120326292"></p>
 
         </div>
 
