@@ -257,13 +257,13 @@
                     
                         <span class="post-count">
                             📑字数:
-                        <a href="">349</a><br>  
+                        <a href="">437</a><br>  
                         </span>
                     
                     
                         <span class="post-count">
                     ⏰预计阅读时间:
-                        <a href="">2min</a>  
+                        <a href="">3min</a>  
                         </span>
                     
                 </div>
@@ -358,6 +358,29 @@
 </tbody>
 </table>
 </div>
+<blockquote>
+<p>An example:</p>
+<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220816162226429.png" alt="image-20220816162226429"></p>
+</blockquote>
+<h2 id="4-scikit-learn"><a href="#4-scikit-learn" class="headerlink" title="4.scikit-learn"></a>4.scikit-learn</h2><p>安装：</p>
+<figure class="highlight cmd"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install scikit-learn</span><br></pre></td></tr></tbody></table></figure>
+<p>Scikit usage steps(5 high level steps)</p>
+<ol>
+<li><p>select a model(estimator object)</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LinearRegression</span><br><span class="line">model = LinearRegression(normalize = <span class="literal">True</span>)</span><br></pre></td></tr></tbody></table></figure>
+</li>
+<li><p>Split the data into test and training sets</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br><span class="line">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = <span class="number">0.3</span>)</span><br></pre></td></tr></tbody></table></figure>
+</li>
+<li><p>Train/fit the model</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">model.fit(X_train, t_train)</span><br></pre></td></tr></tbody></table></figure>
+</li>
+<li><p>Predict Labels for test data</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">predictions = model.predict(X_test)</span><br></pre></td></tr></tbody></table></figure>
+</li>
+<li><p>Evaluate model(create metrics)</p>
+</li>
+</ol>
 
         </div>
 
