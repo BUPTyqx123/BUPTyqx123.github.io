@@ -257,13 +257,13 @@
                     
                         <span class="post-count">
                             📑字数:
-                        <a href="">1,197</a><br>  
+                        <a href="">1,473</a><br>  
                         </span>
                     
                     
                         <span class="post-count">
                     ⏰预计阅读时间:
-                        <a href="">7min</a>  
+                        <a href="">9min</a>  
                         </span>
                     
                 </div>
@@ -411,8 +411,7 @@
 <li>Machine learning algorithms (models) need numerical features to perform learning and prediction activities</li>
 <li>We need to <strong>extract</strong> numerical features from the raw text </li>
 </ul>
-<p><strong>count vectorization</strong></p>
-<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220816183842413.png" alt="image-20220816183842413"></p>
+<h3 id="5-1-count-vectorization"><a href="#5-1-count-vectorization" class="headerlink" title="5.1 count vectorization"></a>5.1 count vectorization</h3><p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220816183842413.png" alt="image-20220816183842413"></p>
 <p><code>CountVectorizer</code> 类：</p>
 <ul>
 <li>create a matrix of counts,with columns as words，会将文本中的词语转换为词频矩阵</li>
@@ -423,19 +422,16 @@
 </ul>
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Scikit-learn's CountVectorizer</span></span><br><span class="line"><span class="keyword">from</span> sklearn.feature_extraction.text <span class="keyword">import</span> CountVectorizer</span><br><span class="line">count_vect = CountVectorizer()</span><br><span class="line">X_train_counts = count_vect.fit_transform(X_train)</span><br><span class="line">X_train_counts.shape</span><br></pre></td></tr></tbody></table></figure>
 <p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220816185514946.png" alt="image-20220816185514946"></p>
-<p><strong>Term Frequency(TF)</strong></p>
-<ul>
+<h3 id="5-2-Term-Frequency-TF"><a href="#5-2-Term-Frequency-TF" class="headerlink" title="5.2 Term Frequency(TF)"></a>5.2 Term Frequency(TF)</h3><ul>
 <li>Term Frequency <code>tf(t,d)</code>-raw count of a term in a document, i.e.,the number of times a term <code>t</code> occurs in document <code>d</code></li>
 <li>However,Term Frequency alone is not enough for a thorough feature analysis of the text. Consider stop words like “a” or “the” </li>
 <li>Because the term “the” is so common, term frequency will tend to incorrectly emphasize documents which happen to use the word “the” more frequently, without giving enough weight to the more meaningful terms “red” and “dogs”.</li>
 </ul>
-<p><strong>Inverse Document Frequency(IDF)</strong></p>
-<ul>
+<h3 id="5-3-Inverse-Document-Frequency-IDF"><a href="#5-3-Inverse-Document-Frequency-IDF" class="headerlink" title="5.3 Inverse Document Frequency(IDF)"></a>5.3 Inverse Document Frequency(IDF)</h3><ul>
 <li>In order to reduce the unwanted impact of common words, an <strong>inverse document frequency</strong> factor is incorporated which diminishes the weight of terms that occur very frequently in the document set and increases the weight of terms that occur rarely</li>
 <li>It is the logarithmically scaled inverse fraction of the documents that contain the word (obtained by dividing the total number of documents by the number of documents containing the term, and then taking the logarithm of that quotient)</li>
 </ul>
-<p><strong>TF-IDF</strong></p>
-<ul>
+<h3 id="5-4-TF-IDF"><a href="#5-4-TF-IDF" class="headerlink" title="5.4 TF-IDF"></a>5.4 TF-IDF</h3><ul>
 <li>TF-IDF = Term Frequency * (1/document Frequency)</li>
 <li>TF-IDF = Term Frequency * Inverse Document Frequency</li>
 </ul>
@@ -447,14 +443,26 @@
 
 \end{align}</script><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Transform Counts to Frequencies with Tf-idf</span></span><br><span class="line"><span class="keyword">from</span> sklearn.feature_extraction.text <span class="keyword">import</span> TfidfTransformer</span><br><span class="line">tfidf_transformer = TfidfTransformer()</span><br><span class="line">X_train_tfidf = tfidf_transformer.fit_transform(X_train_counts)</span><br><span class="line">X_train_tfidf.shape</span><br></pre></td></tr></tbody></table></figure>
 <p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220816185638730.png" alt="image-20220816185638730"></p>
-<p><strong>TF-IDF Vectorizer</strong></p>
-<ul>
+<h3 id="5-5-TF-IDF-Vectorizer"><a href="#5-5-TF-IDF-Vectorizer" class="headerlink" title="5.5 TF-IDF Vectorizer"></a>5.5 TF-IDF Vectorizer</h3><ul>
 <li>TF-IDF Vectorizer is superior to raw Count Vectorizer</li>
 <li>TF-IDF allows us to understand the context of words across an <strong>entire corpus of documents</strong>, instead of just its relative importance in a single document</li>
 <li>Scikit-Learn’s <code>TfidfVectorizer</code> to train and fit our models </li>
 </ul>
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.feature_extraction.text <span class="keyword">import</span> TfidfVectorizer</span><br><span class="line">vectorizer = TfidfVectorizer()</span><br><span class="line">X_train_tfidf = vectorizer.fit_transform(X_train) </span><br><span class="line"><span class="comment"># 使用原始的X_train</span></span><br><span class="line">X_train_tfidf.shape</span><br></pre></td></tr></tbody></table></figure>
 <p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220816185819948.png" alt="image-20220816185819948"></p>
+<h3 id="5-6-Pipline"><a href="#5-6-Pipline" class="headerlink" title="5.6 Pipline"></a>5.6 Pipline</h3><ul>
+<li>Pipeline of transforms with a final estimator.</li>
+<li>Sequentially apply a list of transforms and a final estimator. Intermediate steps of the pipeline must be ‘transforms’, that is, they must implement <code>fit</code> and <code>transform</code> methods. The final estimator only needs to implement <code>fit</code>. The transformers in the pipeline can be cached using <code>memory</code> argument.</li>
+<li>The purpose of the pipeline is to assemble several steps that can be cross-validated together while setting different parameters. For this, it enables setting parameters of the various steps using their names and the parameter name separated by a <code>'__'</code>, as in the example below. A step’s estimator may be replaced entirely by setting the parameter with its name to another estimator, or a transformer removed by setting it to <code>'passthrough'</code> or <code>None</code>.</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.pipeline <span class="keyword">import</span> Pipeline</span><br><span class="line"><span class="keyword">from</span> sklearn.svm <span class="keyword">import</span> LinearSVC</span><br><span class="line"><span class="keyword">from</span> sklearn.feature_extraction.text <span class="keyword">import</span> TfidfVectorizer</span><br><span class="line">text_clf = Pipeline([(<span class="string">'tfidf'</span>, TfidfVectorizer()), (<span class="string">'clf'</span>, LinearSVC())])</span><br><span class="line"><span class="comment"># Feed the training data through the pipeline</span></span><br><span class="line">text_clf.fit(X_train, y_train)  </span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220817145239824.png" alt="image-20220817145239824"></p>
+<p>对预测结果进行评估验证，可以发现此时准确度有明显的提升：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn <span class="keyword">import</span> metrics</span><br><span class="line">predictions = text_clf.predict(X_test)    <span class="comment"># 预测</span></span><br><span class="line"><span class="built_in">print</span>(metrics.confusion_matrix(y_test,predictions))      <span class="comment"># 混淆矩阵</span></span><br><span class="line"><span class="built_in">print</span>(metrics.classification_report(y_test,predictions)) <span class="comment"># 预测报告</span></span><br><span class="line"><span class="built_in">print</span>(metrics.accuracy_score(y_test,predictions))        <span class="comment"># 预测准确度</span></span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220817150011864.png" alt="image-20220817150011864"></p>
+<p>使用该算法预测两个句子：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">text_clf.predict([<span class="string">"Hello, how are you?"</span>])</span><br><span class="line">text_clf.predict([<span class="string">'Congratulations, you have won $1 M'</span>])</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220817151218786.png" alt="image-20220817151218786"></p>
 
         </div>
 
