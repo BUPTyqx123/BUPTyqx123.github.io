@@ -257,13 +257,13 @@
                     
                         <span class="post-count">
                             📑字数:
-                        <a href="">1,594</a><br>  
+                        <a href="">2,377</a><br>  
                         </span>
                     
                     
                         <span class="post-count">
                     ⏰预计阅读时间:
-                        <a href="">9min</a>  
+                        <a href="">14min</a>  
                         </span>
                     
                 </div>
@@ -474,6 +474,95 @@
 <li>Fit/train the classifier</li>
 <li>Test the classifier on new data</li>
 <li>Evaluate performance</li>
+</ul>
+<h2 id="6-Semantic-Analysis"><a href="#6-Semantic-Analysis" class="headerlink" title="6. Semantic Analysis"></a>6. Semantic Analysis</h2><h3 id="6-1-概述"><a href="#6-1-概述" class="headerlink" title="6.1 概述"></a>6.1 概述</h3><ul>
+<li>Semantic analysis is the process of drawing <strong>meaning</strong> from natural language text</li>
+<li>It attempts to mimic the process humans follow, i.e., processing words in the <strong>context</strong> of their appearance, <strong>relating</strong> them with other words, and selecting most appropriate meaning (removing ambiguities)</li>
+<li>Context plays an important role, it helps to attribute the correct meaning </li>
+<li>It is an essential sub-task of NLP and the driving force behind machine learning tools such as chatbots, search engines and text analysis</li>
+</ul>
+<p><strong>How does Semantic Analysis work?</strong></p>
+<ul>
+<li>Semantic analysis begins by understanding relationships between lexical items (words, phrasal verbs, noun phrases, etc.)</li>
+<li>It creates lexical hierarchies using: <ul>
+<li><strong>Hyponyms/Hypernyms</strong>-inheritance like structure</li>
+<li><strong>Meronomy</strong>-whole/part like structure</li>
+<li><strong>Polysemy</strong>-relationship based on common core meaning </li>
+<li><strong>Synonyms</strong>-words with same meaning and can substitute </li>
+<li><strong>Antonyms</strong>-words with opposite meaning</li>
+<li><strong>Homonyms</strong>-words with similar sound &amp; spelling but different meaning</li>
+</ul>
+</li>
+<li>Semantic analysis considers signs and symbols (semiotics) and collocations (words that often go together)</li>
+<li>Automated semantic analysis works with the help of machine learning algorithms. By feeding <strong>semantically enhanced</strong> algorithms with sample text,you can train machines to make accurate predictions based on past observations </li>
+<li>Two important sub-tasks involved in this approach are:<ul>
+<li><strong>Word sense disambiguation</strong> (e.g.,Orange could mean color,fruit, or a county in California) </li>
+<li><strong>Relationship extraction</strong>(e.g.,relationship between persons, organizations, and places) </li>
+</ul>
+</li>
+</ul>
+<h3 id="6-2-Semantic-Analysis-Techniques"><a href="#6-2-Semantic-Analysis-Techniques" class="headerlink" title="6.2 Semantic Analysis Techniques"></a>6.2 Semantic Analysis Techniques</h3><hr>
+<p><strong>Classification Models</strong></p>
+<ul>
+<li><strong>Topic Classification</strong>：Sorting text to predefined <strong>topics</strong> that they belong to. For example, a service ticket could be regarding a “payment issue” or “shipping problem”.</li>
+<li><strong>Sentiment Analysis</strong>：Detecting positive, negative, or neutral <strong>emotions</strong>. This could mean, for example, how customers feel about a product or service.</li>
+<li><strong>Intent Classification</strong>：Classifying text based on what customers <strong>intend to do next</strong>. This could mean, for example, that customer wants to talk to an expert.</li>
+</ul>
+<hr>
+<p><strong>Extraction Models</strong></p>
+<ul>
+<li><p><strong>Keyword Extraction</strong></p>
+<ul>
+<li>Finding relevant words and expressions in a text</li>
+<li>Used for more granular insight,e.g.,a feedback classified as negative, what words or topics are mentioned most often</li>
+</ul>
+</li>
+<li><p><strong>Entity Extraction</strong></p>
+<ul>
+<li>Identifying named entities in text. This could be customized to automatically detect company specific texts, e.g.,product/service names, ticket # etc.</li>
+</ul>
+</li>
+</ul>
+<h2 id="7-Word-Vectors"><a href="#7-Word-Vectors" class="headerlink" title="7. Word Vectors"></a>7. Word Vectors</h2><p><strong>What are word vectors?</strong></p>
+<ul>
+<li>A word vector is a set of <strong>numbers</strong> that <strong>represent</strong> the <strong>meaning</strong> of a word,with a lot of contextual information</li>
+<li>A vector representing a word is an array of real-valued numbers, where each point captures a <strong>dimension</strong> of word’s meaning </li>
+<li>These numbers encode the meaning of words in such a way that words close in vector space are expected to have similar meaning </li>
+<li>Creation of word vectors is a critical component of semantic analysis, and this approach is called <strong>word embedding</strong></li>
+</ul>
+<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/0mRGKYujQkI7PcMDE.png" alt="img"></p>
+<p><strong>Why word vectors?</strong></p>
+<ul>
+<li>Representing words with numbers enables mathematical operations: such as detecting (cosine) similarity, adding &amp;subtracting vectors, finding associations, and predicting meaning</li>
+</ul>
+<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220817172136226.png" alt="image-20220817172136226"></p>
+<p>Interesting relationships can be established between word vectors.</p>
+<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220817172222683.png" alt="image-20220817172222683"></p>
+<p><strong>How are word vectors created?</strong></p>
+<ul>
+<li>Word vectors are created by feeding a large corpus of text into a deep learning model (neural network)</li>
+<li>Word vectors are created by following distributional hypothesis, which states-<strong>“You shall know a word by the company it keeps”</strong> </li>
+<li>Words that share similar context tend to have similar meaning. </li>
+<li>Models either use context to predict a target word (CBOW method) or use a word to predict a target context (Skip-Gram method)</li>
+<li><code>word2vec</code> is a two-layer neural network model </li>
+</ul>
+<h2 id="8-sentiment-analysis"><a href="#8-sentiment-analysis" class="headerlink" title="8. sentiment analysis"></a>8. sentiment analysis</h2><p><strong>What is sentiment analysis?</strong></p>
+<ul>
+<li>Sentiment analysis is a method that detects polarity (e.g.,positive or negative opinion) within the text</li>
+<li>It is also used to detect emotions (happy, sad, angry, etc.), urgency (urgent vs. not urgent) and intentions (interested vs. not interested) </li>
+<li>Sentiment analysis can be rule-based (manually crafted rules), automatic(feature extraction &amp; text classification),or hybrid </li>
+<li>Sentiment analysis is hard due to multiple reasons - sarcasm, idioms, negation handling, adverbial modifiers, comparisons etc. </li>
+</ul>
+<p><strong>How is sentiment analysis used?</strong></p>
+<ul>
+<li>Since people share their opinion more openly than ever before, sentiment analysis is useful in a variety of ways such as: social media monitoring, customer support, customer feedback, brand monitoring, voice of customer, market research, etc.</li>
+<li>Sentiment analysis can also be used as a real-time analysis tool, especially if events requiring urgent action need to be detected</li>
+</ul>
+<h2 id="9-VADER"><a href="#9-VADER" class="headerlink" title="9. VADER"></a>9. VADER</h2><ul>
+<li>Valence Aware Dictionary for Sentiment Reasoning (VADER) is a model used for text sentiment analysis that is sensitive to both <strong>polarity</strong> (positive/negative) and <strong>intensity</strong> (strength) of emotion </li>
+<li>Primarily, VADER sentiment analysis relies on a dictionary which maps lexical features to emotion intensities called <strong>sentiment scores</strong></li>
+<li>The sentiment score of a text can be obtained by summing up the intensity of each word in the text</li>
+<li>VADER is a rule-based system</li>
 </ul>
 
         </div>
