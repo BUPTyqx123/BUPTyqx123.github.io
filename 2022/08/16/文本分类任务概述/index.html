@@ -257,13 +257,13 @@
                     
                         <span class="post-count">
                             📑字数:
-                        <a href="">2,377</a><br>  
+                        <a href="">2,728</a><br>  
                         </span>
                     
                     
                         <span class="post-count">
                     ⏰预计阅读时间:
-                        <a href="">14min</a>  
+                        <a href="">16min</a>  
                         </span>
                     
                 </div>
@@ -546,6 +546,26 @@
 <li>Models either use context to predict a target word (CBOW method) or use a word to predict a target context (Skip-Gram method)</li>
 <li><code>word2vec</code> is a two-layer neural network model </li>
 </ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> spacy</span><br><span class="line">nlp = spacy.load(<span class="string">'en_core_web_md'</span>)  <span class="comment"># 使用大模型</span></span><br><span class="line">nlp(<span class="string">u'lion'</span>).vector                 <span class="comment"># 计算词向量</span></span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220818230411686.png" alt="image-20220818230411686"></p>
+<p>查看向量的维度：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">doc = nlp(<span class="string">u'lion'</span>)</span><br><span class="line"><span class="built_in">print</span>(doc.vector.shape)</span><br><span class="line"><span class="built_in">print</span>(doc.vocab.vectors.shape)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220818230855115.png" alt="image-20220818230855115"></p>
+<p>查看句子的向量表示，同样是300个维度：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">doc = nlp(<span class="string">u'The quick brown fox jumps over the lazy dog'</span>)</span><br><span class="line">doc.vector</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220818230939376.png" alt="image-20220818230939376"></p>
+<p><strong>Identifying similar vectors</strong>：The best way to expose vector relationships is through the <code>.similarity()</code> method of Doc tokens.</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tokens = nlp(<span class="string">u'dog cat monkey'</span>)</span><br><span class="line"><span class="keyword">for</span> token1 <span class="keyword">in</span> tokens:</span><br><span class="line">    <span class="keyword">for</span> token2 <span class="keyword">in</span> tokens:</span><br><span class="line">        <span class="built_in">print</span>(token1.text, token2.text, token1.similarity(token2))</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220818231849802.png" alt="image-20220818231849802"></p>
+<p>Note that order doesn’t matter. <code>token1.similarity(token2)</code> has the same value as <code>token2.similarity(token1)</code></p>
+<p><strong>Vector norms</strong></p>
+<p>It’s sometimes helpful to aggregate 300 dimensions into a Euclidian (L2) norm, computed as the square root of the sum-of-squared-vectors. This is accessible as the <code>.vector_norm</code> token attribute. Other helpful attributes include <code>.has_vector</code> and <code>.is_oov</code> or <strong>out of vocabulary</strong>.</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">tokens = nlp(<span class="string">u'dog cat nowaythere'</span>)</span><br><span class="line"><span class="keyword">for</span> token <span class="keyword">in</span> tokens:</span><br><span class="line">    <span class="built_in">print</span>(token.text, token.has_vector, token.vector_norm, token.is_oov)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220818233555714.png" alt="image-20220818233555714"></p>
+<p><strong>Vector arithmetic</strong></p>
+<p>Believe it or not, we can actually calculate new vectors by adding &amp; subtracting related vectors. A famous example suggests</p>
+<p></p><pre>"king" - "man" + "woman" = "queen"</pre><br><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> scipy <span class="keyword">import</span> spatial</span><br><span class="line">cosine_similarity = <span class="keyword">lambda</span> x, y: <span class="number">1</span> - spatial.distance.cosine(x, y)</span><br><span class="line">king = nlp.vocab[<span class="string">'king'</span>].vector</span><br><span class="line">man = nlp.vocab[<span class="string">'man'</span>].vector</span><br><span class="line">woman = nlp.vocab[<span class="string">'woman'</span>].vector</span><br><span class="line">queen = nlp.vocab[<span class="string">'queen'</span>].vector</span><br><span class="line">new_vector = king - man + woman</span><br><span class="line">cosine_similarity(new_vector, queen)</span><br><span class="line">cosine_similarity(new_vector, woman)</span><br></pre></td></tr></tbody></table></figure><p></p>
+<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220818234152751.png" alt="image-20220818234152751"></p>
 <h2 id="8-sentiment-analysis"><a href="#8-sentiment-analysis" class="headerlink" title="8. sentiment analysis"></a>8. sentiment analysis</h2><p><strong>What is sentiment analysis?</strong></p>
 <ul>
 <li>Sentiment analysis is a method that detects polarity (e.g.,positive or negative opinion) within the text</li>
@@ -563,6 +583,10 @@
 <li>Primarily, VADER sentiment analysis relies on a dictionary which maps lexical features to emotion intensities called <strong>sentiment scores</strong></li>
 <li>The sentiment score of a text can be obtained by summing up the intensity of each word in the text</li>
 <li>VADER is a rule-based system</li>
+<li>VADER understands that words like “love”, “like”, “enjoy”,“happy” all convey a <strong>positive</strong> sentiment.</li>
+<li>VADER is intelligent enough to understand basic context of these words, such as “did not love” as a negative sentiment.</li>
+<li>It uses rules to also understand that the capitalization and punctuation enhance intensity of emotions, e.g., “LOVE!!!!” </li>
+<li>VADER is available in the NLTK package and can be applied directly to unlabeled data.</li>
 </ul>
 
         </div>
