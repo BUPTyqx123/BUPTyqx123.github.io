@@ -257,13 +257,13 @@
                     
                         <span class="post-count">
                             📑字数:
-                        <a href="">2,728</a><br>  
+                        <a href="">3,124</a><br>  
                         </span>
                     
                     
                         <span class="post-count">
                     ⏰预计阅读时间:
-                        <a href="">16min</a>  
+                        <a href="">19min</a>  
                         </span>
                     
                 </div>
@@ -588,6 +588,45 @@
 <li>It uses rules to also understand that the capitalization and punctuation enhance intensity of emotions, e.g., “LOVE!!!!” </li>
 <li>VADER is available in the NLTK package and can be applied directly to unlabeled data.</li>
 </ul>
+<p><strong>Download the VADER lexicon.</strong> </p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line">nltk.download(<span class="string">'vader_lexicon'</span>)</span><br><span class="line"><span class="keyword">from</span> nltk.sentiment.vader <span class="keyword">import</span> SentimentIntensityAnalyzer</span><br><span class="line">sid = SentimentIntensityAnalyzer()</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220819171742146.png" alt="image-20220819171742146"></p>
+<p>VADER’s <code>SentimentIntensityAnalyzer()</code> takes in a string and returns a dictionary of scores in each of four categories:</p>
+<ul>
+<li>negative</li>
+<li>neutral</li>
+<li>positive</li>
+<li>compound <strong>(computed by normalizing the scores above)</strong></li>
+</ul>
+<p>计算每个句子中包含的情感比例：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="string">'This was a good movie.'</span></span><br><span class="line">sid.polarity_scores(a)</span><br><span class="line">a = <span class="string">'This was the best, most awesome movie EVER MADE!!!'</span></span><br><span class="line">sid.polarity_scores(a)</span><br><span class="line">a = <span class="string">'This was the worst film to ever disgrace the screen.'</span></span><br><span class="line">sid.polarity_scores(a)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220819171855755.png" alt="image-20220819171855755"></p>
+<p><strong>Adding Scores and Labels to the DataFrame</strong></p>
+<p>在<code>score</code>后加入一列<code>review</code>数据</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">df[<span class="string">'scores'</span>] = df[<span class="string">'review'</span>].apply(<span class="keyword">lambda</span> review: sid.polarity_scores(review))</span><br><span class="line">df.head()</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220819173450036.png" alt="image-20220819173450036"></p>
+<h2 id="10-Sentiment-Analysis-Project"><a href="#10-Sentiment-Analysis-Project" class="headerlink" title="10. Sentiment Analysis Project"></a>10. Sentiment Analysis Project</h2><p>For this project, we’ll perform the same type of NLTK VADER sentiment analysis, this time on our movie reviews dataset.</p>
+<p>The 2,000 record IMDb movie review database is accessible through NLTK directly with</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> movie_reviews</span><br></pre></td></tr></tbody></table></figure>
+<p>However, since we already have it in a tab-delimited file we’ll use that instead.</p>
+<p><strong>Load the Data</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line">df = pd.read_csv(<span class="string">'../TextFiles/moviereviews.tsv'</span>, sep=<span class="string">'\t'</span>)</span><br><span class="line">df.head()</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220819174922267.png" alt="image-20220819174922267"></p>
+<p><strong>Remove Blank Records (optional)</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># REMOVE NaN VALUES AND EMPTY STRINGS:</span></span><br><span class="line">df.dropna(inplace=<span class="literal">True</span>)</span><br><span class="line">blanks = []  <span class="comment"># start with an empty list</span></span><br><span class="line"><span class="keyword">for</span> i,lb,rv <span class="keyword">in</span> df.itertuples():  <span class="comment"># iterate over the DataFrame</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">type</span>(rv)==<span class="built_in">str</span>:            <span class="comment"># avoid NaN values</span></span><br><span class="line">        <span class="keyword">if</span> rv.isspace():         <span class="comment"># test 'review' for whitespace</span></span><br><span class="line">            blanks.append(i)     <span class="comment"># add matching index numbers to the list</span></span><br><span class="line">df.drop(blanks, inplace=<span class="literal">True</span>)</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220819174948622.png" alt="image-20220819174948622"></p>
+<p><strong>Import <code>SentimentIntensityAnalyzer</code> and create an sid object</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.sentiment.vader <span class="keyword">import</span> SentimentIntensityAnalyzer</span><br><span class="line">sid = SentimentIntensityAnalyzer()</span><br></pre></td></tr></tbody></table></figure>
+<p><strong>Use sid to append a <code>comp_score</code> to the dataset</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">df[<span class="string">'scores'</span>] = df[<span class="string">'review'</span>].apply(<span class="keyword">lambda</span> review: sid.polarity_scores(review))</span><br><span class="line">df[<span class="string">'compound'</span>]  = df[<span class="string">'scores'</span>].apply(<span class="keyword">lambda</span> score_dict: score_dict[<span class="string">'compound'</span>])</span><br><span class="line">df[<span class="string">'comp_score'</span>] = df[<span class="string">'compound'</span>].apply(<span class="keyword">lambda</span> c: <span class="string">'pos'</span> <span class="keyword">if</span> c &gt;=<span class="number">0</span> <span class="keyword">else</span> <span class="string">'neg'</span>)</span><br><span class="line">df.head()</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220819175107094.png" alt="image-20220819175107094"></p>
+<p><strong>Perform a comparison analysis between the original <code>label</code> and <code>comp_score</code></strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> accuracy_score</span><br><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> classification_report,confusion_matrix</span><br><span class="line">accuracy_score(df[<span class="string">'label'</span>],df[<span class="string">'comp_score'</span>])</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220819175210237.png" alt="image-20220819175210237"></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(classification_report(df[<span class="string">'label'</span>],df[<span class="string">'comp_score'</span>]))</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220819175221230.png" alt="image-20220819175221230"></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(confusion_matrix(df[<span class="string">'label'</span>],df[<span class="string">'comp_score'</span>]))</span><br></pre></td></tr></tbody></table></figure>
+<p><img src="/2022/08/16/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E6%A6%82%E8%BF%B0/image-20220819175312781.png" alt="image-20220819175312781"></p>
 
         </div>
 
